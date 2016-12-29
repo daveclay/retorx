@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>core</artifactId>
+  <version>1.2.0-SNAPSHOT</version>
+	<name>${project.artifactId}</name>
+
+	<parent>
+		<groupId>net.retorx</groupId>
+		<artifactId>retorx</artifactId>
+    <version>1.2.0-SNAPSHOT</version>
+		<relativePath>../</relativePath>
+	</parent>
+
+<!--
+	<repositories>
+		<repository>
+			<id>scala-tools.org</id>
+			<name>Scala-Tools Maven2 Repository</name>
+			<url>http://scala-tools.org/repo-releases</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>scala-tools.org</id>
+			<name>Scala-Tools Maven2 Repository</name>
+			<url>http://scala-tools.org/repo-releases</url>
+		</pluginRepository>
+	</pluginRepositories>
+-->
+	<dependencies>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>${scala.version}</version>
+		</dependency>
+        <dependency>
+          <groupId>com.google.inject</groupId>
+          <artifactId>guice</artifactId>
+          <version>3.0</version>
+        </dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+	</dependencies>
+</project>

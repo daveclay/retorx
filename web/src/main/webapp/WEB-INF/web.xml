@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+		 version="2.5">
+
+	<context-param>
+		<param-name>resteasy.guice.modules</param-name>
+		<param-value>net.retorx.RetorxModule</param-value>
+	</context-param>
+	<context-param>
+		<param-name>resteasy.servlet.mapping.prefix</param-name>
+		<param-value>/services</param-value>
+	</context-param>
+
+	<servlet>
+		<servlet-name>Resteasy</servlet-name>
+		<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Resteasy</servlet-name>
+		<url-pattern>/services/*</url-pattern>
+	</servlet-mapping>
+
+	<listener>
+		<listener-class>net.retorx.web.StartupListener</listener-class>
+	</listener>
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+
+	<security-role>
+		<role-name>admin</role-name>
+	</security-role>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>admin</web-resource-name>
+			<description>administrative services</description>
+			<url-pattern>/services/reload/*</url-pattern>
+			<url-pattern>/admin.html</url-pattern>
+			<url-pattern>/services/admin/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<description>administrators</description>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<login-config>
+		<auth-method>BASIC</auth-method>
+		<realm-name>admin</realm-name>
+	</login-config>
+</web-app>

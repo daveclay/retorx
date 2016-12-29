@@ -16,10 +16,18 @@
         <developerConnection>scm:git:git@github.com:daveclay/retorx.git</developerConnection>
     </scm>
 
+    <distributionManagement>
+        <repository>
+            <id>maven-repository</id>
+            <url>${github.maven.repository}</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <encoding>UTF-8</encoding>
         <scala.version>2.11.8</scala.version>
         <jackson.version>2.8.5</jackson.version>
+        <github.maven.repository>file:///Users/daveclay/work/mvn-artifacts/</github.maven.repository>
     </properties>
 
     <dependencies>

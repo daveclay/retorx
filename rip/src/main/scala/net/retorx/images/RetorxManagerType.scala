@@ -47,12 +47,12 @@ class RetorxManagerType @Inject()(imageUtil: ImageUtil,
 	private def findOriginalImage(directory: File) = {
 		var imageFile: Option[File] = None
 
-		directory.listFiles.foreach(file => {
+		directory.listFiles.foreach { file =>
 			val fileName = FileUtil.getNameWithoutExtensionFromFile(file)
 			if (fileName.equals(directory.getName)) {
 				imageFile = Some(file)
 			}
-		})
+		}
 
 		imageFile.getOrElse(throw new IllegalArgumentException("Could not find image file in " + directory.getAbsolutePath))
 	}

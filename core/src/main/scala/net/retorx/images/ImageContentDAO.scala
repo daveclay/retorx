@@ -8,7 +8,7 @@ import net.retorx.util.LockUtil
 import scala.collection.immutable.{SortedSet, TreeSet}
 
 @Singleton
-class ImageData @Inject()(imagesDirectoryManager: ImagesDirectoryManager) {
+class ImageContentLibrary @Inject()(imagesDirectoryManager: ImagesDirectoryManager) {
 
 	var imageContentByName = Map[String, ImageContent]()
 	var imageContentByTag = Map[String, SortedSet[ImageContent]]()
@@ -16,12 +16,12 @@ class ImageData @Inject()(imagesDirectoryManager: ImagesDirectoryManager) {
 	var tags = List[String]()
 
 	def reloadImageDataFromDisk() = {
-		val newImageData = new ImageData(imagesDirectoryManager)
-		newImageData.loadDefaultTags()
+		val imageContentLibrary = new ImageContentLibrary(imagesDirectoryManager)
+		imageContentLibrary.loadDefaultTags()
 		imagesDirectoryManager.loadImagesFromDisk { imageContent =>
-			newImageData.addImageContent(imageContent)
+			imageContentLibrary.addImageContent(imageContent)
 		}
-		newImageData
+		imageContentLibrary
 	}
 
 	def reprocessImagesFromOriginal(imageContent: ImageContent) {
@@ -36,13 +36,13 @@ class ImageData @Inject()(imagesDirectoryManager: ImagesDirectoryManager) {
 		imagesDirectoryManager.deleteImageFile(imageFile)
 		// Todo: remove properties? Do we know which ones? Assume? What fucking properties are you talking about?
 		// imageContent.setImageFiles(imageContent.getImageFiles.filterNot(anImageFile => anImageFile.name.equals(imageContent.name)))
-		val imageData = newImageData()
+		val imageContentLibrary = newImageContentLibrary()
 		// Todo: copy maps, after filtering. probably rebuild tags.
-		imageData
+		imageContentLibrary
 	}
 
-	private def newImageData() = {
-		new ImageData(imagesDirectoryManager)
+	private def newImageContentLibrary() = {
+		new ImageContentLibrary(imagesDirectoryManager)
 	}
 
 	private def loadDefaultTags() {
@@ -89,26 +89,26 @@ class ImageData @Inject()(imagesDirectoryManager: ImagesDirectoryManager) {
 }
 
 @Singleton
-class ImageContentDAO @Inject()(var imageData: ImageData) {
+class ImageContentDAO @Inject()(var imageContentLibrary: ImageContentLibrary) {
 
 	private val readWriteLock = new ReentrantReadWriteLock()
-	private val writeImageDataLock = readWriteLock.writeLock()
-	private val readImageDataLock = readWriteLock.readLock()
+	private val writeImageContentLibraryLock = readWriteLock.writeLock()
+	private val readImageContentLibrary = readWriteLock.readLock()
 	private val random = new Random(System.currentTimeMillis())
 
 	private def reset() {
-		setImageData(imageData.reloadImageDataFromDisk())
+		setImageContentLibrary(imageContentLibrary.reloadImageDataFromDisk())
 	}
 
-	private def setImageData(newImageData: ImageData) {
-		LockUtil.withLock(writeImageDataLock, () => {
-			imageData = newImageData
+	private def setImageContentLibrary(imageContentLibrary: ImageContentLibrary) {
+		LockUtil.withLock(writeImageContentLibraryLock, () => {
+			this.imageContentLibrary = imageContentLibrary
 		})
 	}
 
-	private def withImageData[U](f: (ImageData) => U) = {
-		LockUtil.withLock(readImageDataLock, () => {
-			f(imageData)
+	private def withImageContentLibrary[U](f: (ImageContentLibrary) => U) = {
+		LockUtil.withLock(readImageContentLibrary, () => {
+			f(imageContentLibrary)
 		})
 	}
 
@@ -121,27 +121,29 @@ class ImageContentDAO @Inject()(var imageData: ImageData) {
 	}
 
 	def replaceOriginalImage(imageContent: ImageContent) {
-		imageData.reprocessImagesFromOriginal(imageContent)
+		imageContentLibrary.reprocessImagesFromOriginal(imageContent)
 	}
 
 	def addImageContent(imageContent: ImageContent) = {
-		withImageData((imageData) => imageData.addImageContent(imageContent))
+		withImageContentLibrary { imageContentLibrary =>
+			imageContentLibrary.addImageContent(imageContent)
+		}
 	}
 
 	def deleteImageFileForImage(imageContent: ImageContent, imageFile: ImageFile) = {
-		setImageData(imageData.buildWithoutImageFile(imageContent, imageFile))
+		setImageContentLibrary(imageContentLibrary.buildWithoutImageFile(imageContent, imageFile))
 	}
 
 	def renameTag(existingTag: String, newTag: String): Unit = {
-		withImageData { imageData =>
-			imageData.renameTag(existingTag, newTag)
+		withImageContentLibrary { imageContentLibrary =>
+			imageContentLibrary.renameTag(existingTag, newTag)
 		}
 	}
 
 	def getTags = {
-		withImageData((imageData) => {
-			imageData.tags
-		})
+		withImageContentLibrary { imageContentLibrary =>
+			imageContentLibrary.tags
+		}
 	}
 
 	def createTagImage(tag: String) = {
@@ -160,28 +162,28 @@ class ImageContentDAO @Inject()(var imageData: ImageData) {
 	}
 
 	def getImageContentByTag(tag: String) = {
-		withImageData((imageData) => {
-			imageData.imageContentByTag.getOrElse(tag, TreeSet[ImageContent]())
-		})
+		withImageContentLibrary { imageContentLibrary =>
+			imageContentLibrary.imageContentByTag.getOrElse(tag, TreeSet[ImageContent]())
+		}
 	}
 
 	def getAllImageContent = {
-		withImageData((imageData) => {
-			imageData.imageContents
-		})
+		withImageContentLibrary { imageContentLibrary =>
+			imageContentLibrary.imageContents
+		}
 	}
 
 	def getImageContent(id: String) = {
-		withImageData((imageData) => {
-			imageData.imageContentByName(id)
-		})
+		withImageContentLibrary { imageContentLibrary =>
+			imageContentLibrary.imageContentByName(id)
+		}
 	}
 
 	def getLatestImages = {
-		withImageData((imageData) => {
-			val tags = imageData.imageContents.head.getTags
+		withImageContentLibrary { imageContentLibrary =>
+			val tags = imageContentLibrary.imageContents.head.getTags
 			getImageContentByTag(tags(0))
-		})
+		}
 	}
 }
 

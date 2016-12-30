@@ -6,7 +6,7 @@ import scala.collection.mutable
 import java.io.File
 import java.util.Date
 
-import net.retorx.images.{ImageContentDAO, ImageData, ImagesDirectoryManager}
+import net.retorx.images.{ImageContentDAO, ImageContentLibrary, ImagesDirectoryManager}
 import org.junit.runner.RunWith
 import org.specs2.mock.Mockito
 import org.specs2.mutable._
@@ -26,7 +26,7 @@ class ImageContentDAOTest extends Specification with Mockito {
     val image3 = newImageContent("image3", image3Properties)
 
     val imagesDirectoryManager = mock[ImagesDirectoryManager]
-    val imageData = new ImageData(imagesDirectoryManager)
+    val imageData = new ImageContentLibrary(imagesDirectoryManager)
 
     "ImageContentDAO" should {
 		"return the list of images for a tag" in new MockImages {

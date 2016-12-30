@@ -22,7 +22,9 @@ class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 			imagesDir.mkdirs()
 		}
 
-		imagesDir.listFiles.foreach(file => {
+		val files = imagesDir.listFiles()
+		val total = files.size
+		files.par.foreach { file  =>
 			try {
 				managerType.buildImageContent(file) match {
 					case Some(imageContent) => callback(imageContent)
@@ -31,7 +33,7 @@ class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 			} catch {
 				case e: Exception => e.printStackTrace()
 			}
-		})
+		}
 	}
 
 	def getDefaultTags: Array[String] = {

@@ -18,9 +18,9 @@ class ImageData @Inject()(imagesDirectoryManager: ImagesDirectoryManager) {
 	def reloadImageDataFromDisk() = {
 		val newImageData = new ImageData(imagesDirectoryManager)
 		newImageData.loadDefaultTags()
-		imagesDirectoryManager.loadImagesFromDisk((imageContent) => {
+		imagesDirectoryManager.loadImagesFromDisk { imageContent =>
 			newImageData.addImageContent(imageContent)
-		})
+		}
 		newImageData
 	}
 

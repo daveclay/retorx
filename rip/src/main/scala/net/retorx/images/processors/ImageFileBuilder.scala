@@ -55,7 +55,7 @@ class ImageFileBuilder(processedImageFileName: String,
 
 		val (width, height) = handleFile(processedFile)
 
-		val imageFile = new ImageFile(processedImageFileName, width, height, imageType, processedFile)
+		val imageFile = ImageFile(processedImageFileName, width, height, imageType, processedFile)
 		imageContentData.addImageFile(processedImageFileName, imageFile)
 	}
 

@@ -113,6 +113,7 @@ class ImageContentData(originalImageFile: File) {
 	}
 
 	private def savePropertiesFile() {
+		System.out.println(f"Saving properties to $propertiesFile")
 		PropertiesUtils.writeProperties(properties, propertiesFile)
 	}
 

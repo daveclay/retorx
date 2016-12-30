@@ -10,8 +10,10 @@ class BufferedImageContentData(originalImageFile: File) extends ImageContentData
 
 	override def newImageContent() = {
 		val imageContent = super.newImageContent()
-		bufferedImagesByName.clear()
-		System.gc()
+		if (bufferedImagesByName.nonEmpty) {
+			bufferedImagesByName.clear()
+			System.gc()
+		}
 		imageContent
 	}
 

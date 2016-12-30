@@ -50,9 +50,11 @@ class ImageData @Inject()(imagesDirectoryManager: ImagesDirectoryManager) {
 	}
 
 	def addImageContent(imageContent: ImageContent) = {
-		imageContentByName = imageContentByName + (imageContent.getName -> imageContent)
-		handleImageContentTags(imageContent)
-		imageContents = imageContents + imageContent
+		synchronized {
+			imageContentByName = imageContentByName + (imageContent.getName -> imageContent)
+			handleImageContentTags(imageContent)
+			imageContents = imageContents + imageContent
+		}
 	}
 
 	private def handleImageContentTags(imageContent: ImageContent) {
@@ -75,10 +77,10 @@ class ImageData @Inject()(imagesDirectoryManager: ImagesDirectoryManager) {
 		// Todo: looping around and modifying to inconsistent state.
 		imageContentByTag.get(existingTag) match {
 			case Some(imageContentsForTag) =>
-				imageContentsForTag.foreach(imageContent => {
+				imageContentsForTag.par.foreach { imageContent =>
 					imageContent.replaceTag(existingTag, newTag)
 					imageContent.savePropertiesFile()
-				})
+				}
 				imagesDirectoryManager.renameTag(existingTag, newTag)
 				imageContentByTag = (imageContentByTag - existingTag) + (newTag -> imageContentsForTag)
 			case None =>

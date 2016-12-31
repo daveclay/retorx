@@ -1,8 +1,10 @@
-function AdminUI(adminApi, imageApi) {
+function AdminUI(adminApi, imageApi, modal) {
     var self = this;
 
     var tagAdminUIs = [];
     var menu = new Menu();
+    var modalFooter = modal.find('.modal-footer');
+    var imageActions = modalFooter.find('#image-actions');
 
     var loader = div("loader");
     loader.text("Loading");
@@ -62,23 +64,13 @@ function AdminUI(adminApi, imageApi) {
 
     this.showImageAdminUI = function(image) {
         // Todo: cache these, I suppose. Not that I'm sure it matters.
-        var imageAdminUI = new ImageAdminUI(adminApi, image, menu);
+        var imageAdminUI = new ImageAdminUI(adminApi, image, modal);
         var element = imageAdminUI.buildUI();
 
-        tagAdminUIsContainer.hide();
-        container.append(element);
-
-        this.addCloseImageMenuItem(imageAdminUI);
-    };
-
-    this.addCloseImageMenuItem = function(imageAdminUI) {
-        menu.addItem("Close Image", function(menuItem) {
-            var imageAdminElem = imageAdminUI.getElement();
-            imageAdminElem.remove();
-            imageAdminUI.disposeUI();
-            tagAdminUIsContainer.show();
-            menu.removeItem(menuItem);
-        });
+        var modalBody = modal.find('.modal-body');
+        modalBody.empty();
+        imageActions.empty();
+        modalBody.append(element);
     };
 }
 
@@ -185,6 +177,8 @@ function TagAdminUI(adminApi, imageApi, tag) {
     this.createThumbnailImage = function(image) {
         var thumbnail = image.findImageFileByName("thumbnail");
         var thumbImageElem = img(thumbnail.src);
+        thumbImageElem.attr("data-toggle", "modal");
+        thumbImageElem.attr("data-target", "#image-modal");
         thumbImageElem.click(function() {
             self.selectImage(image);
         });
@@ -198,18 +192,13 @@ function TagAdminUI(adminApi, imageApi, tag) {
     };
 }
 
-function ImageAdminUI(adminApi, image, menu) {
+function ModalButton(title, action) {
+    var button = $('<button type="button" class="btn btn-primary">' + title  + '</button>');
+    button.click(action);
+}
+
+function ImageAdminUI(adminApi, image, modal) {
     var self = this;
-
-    var propertiesMenuItem = menu.addItem("Properties", function(menuItem) {
-        self.toggleProperties();
-    });
-
-    /*
-    var imageFilesMenuItem = menu.addItem("Image Files", function(menuItem) {
-        self.toggleImageFiles();
-    });
-    */
 
     var container = div("image-admin-container image-admin-defaults");
 
@@ -223,7 +212,7 @@ function ImageAdminUI(adminApi, image, menu) {
     imageContainer.append(imageElem);
 
     var imageName = span("admin-image-name");
-    imageName.text(image.name);
+    modal.find('.modal-title').text(image.name);
 
     var imageDate = span("admin-image-name");
     imageDate.text(image.dateText);
@@ -277,10 +266,6 @@ function ImageAdminUI(adminApi, image, menu) {
             original = image.findImageFileByName("scaled");
         }
         imageElem.attr("src", original.src);
-        container.css({
-            height: $( document ).height()
-        });
-
         return container;
     };
 
@@ -296,8 +281,6 @@ function ImageAdminUI(adminApi, image, menu) {
     };
 
     this.disposeUI = function() {
-        menu.removeItem(propertiesMenuItem);
-        // menu.removeItem(imageFilesMenuItem);
     };
 }
 
@@ -402,9 +385,11 @@ function PropertiesEditor(adminApi, image) {
 
 $(document).ready(function() {
 
+    var modal = $('#image-modal');
+
     var imageApi = new ImageApi(baseImageContentServicePath);
     var adminApi = new AdminApi(baseServicePath);
-    var adminUI = new AdminUI(adminApi, imageApi);
+    var adminUI = new AdminUI(adminApi, imageApi, modal);
 
     $('body').append(adminUI.buildUI());
 

@@ -38,18 +38,17 @@ body {
     width: 100%;
 }
 
+#image-modal {
+    color: black;
+}
+
 .image-admin-container-background {
-    background-color: black;
-    opacity: .85;
-    z-index: -1;
 }
 
 .image-admin-container {
-    z-index: 100;
 }
 
 .image-admin-info-contents {
-    padding: 10px;
     display: inline-block;
     vertical-align: top;
 }
@@ -62,13 +61,6 @@ body {
 
 .image-admin-image-contents img {
     max-width: 100%;
-}
-
-.admin-image-name {
-    margin-top: 3px;
-    margin-right: 3px;
-    display: block;
-    color: white;
 }
 
 .thumb-image-container {

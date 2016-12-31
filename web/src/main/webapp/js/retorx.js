@@ -17,7 +17,7 @@ var tagInfo = {
         "\"</i> The abstract pieces here represent experiments and studies, elements that may be brought into the figurative works.",
 
     "digital collage":
-        "These digital works, created from 2001-2005, examine the ephemeral nature of modern sexuality and technology. " +
+        "These digital works, created from 2001-2007, examine the ephemeral nature of modern sexuality and technology. " +
         "The source images are assembled into abstract bio-mechanical forms with explicit and suggestive figurative " +
         "elements. These images combined the artist's fascination with code, engineering and figurative work.",
 
@@ -26,7 +26,7 @@ var tagInfo = {
     "sculpture": "<i>\"Sculpture is rarely a focus of my work, but has had a major influence on how I approach drawing" +
         " and painting. It's a tool for me to delve further into industrial forms with new media.\"</i>",
 
-    "graphic design": "Album covers and websites for personal and professional projects."
+    "graphic design": "Album covers and websites for various personal and professional projects."
 };
 
 var initialTag = "figure painting";

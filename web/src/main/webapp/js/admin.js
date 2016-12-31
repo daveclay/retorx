@@ -1,7 +1,35 @@
+function PropertiesApi(image, adminApi) {
+
+    this.foreachProperty = function(callback) {
+        var properties = image.properties;
+        if (properties) {
+            for (var name in properties) {
+                if (properties.hasOwnProperty(name)) {
+                    if (name.length > 0) {
+                        callback(name, properties[name]);
+                    }
+                }
+            }
+        }
+    };
+
+    this.getProperties = function() {
+        return image.properties;
+    };
+
+    this.saveProperties = function(newProperties) {
+        adminApi.saveProperties(image, newProperties, function() {
+            image.properties = newProperties;
+        });
+    }
+}
+
 function AdminUI(adminApi, imageApi, modal) {
     var self = this;
 
     var tagAdminUIs = [];
+    var selectedImagesById = {};
+
     var menu = new Menu();
     var modalFooter = modal.find('.modal-footer');
     var imageActions = modalFooter.find('#image-actions');
@@ -26,6 +54,18 @@ function AdminUI(adminApi, imageApi, modal) {
             notify("Reloaded.");
             loader.hide();
         });
+    });
+
+    menu.addItem("mark selected as hidden", function() {
+        loader.show();
+        Object.values(selectedImagesById).forEach(function(image) {
+            var propertiesApi = new PropertiesApi(image, adminApi);
+            var properties = propertiesApi.getProperties();
+            properties['hidden'] = true;
+            propertiesApi.saveProperties(properties);
+        });
+
+        loader.hide();
     });
 
     var menuElem = menu.buildUI();
@@ -59,6 +99,32 @@ function AdminUI(adminApi, imageApi, modal) {
 
         tagAdminUI.onImageSelected(function(image) {
             self.showImageAdminUI(image);
+        });
+
+        $(sectionElem).selectable({
+            filter: 'img',
+            delay: 200,
+            selected: function(event, ui) {
+                var imageId = $(ui.selected).attr("data-imageid");
+                var selectedImage = tagAdminUI.getImageById(imageId);
+                if (selectedImage) {
+                    selectedImagesById[imageId] = selectedImage;
+                } else {
+                    console.warn("Unknown image id ", imageId);
+                }
+            },
+            unselected: function( event, ui ) {
+                var imageId = $(ui.unselected).attr("data-imageid");
+                var selectedImage = tagAdminUI.getImageById(imageId);
+                if (selectedImage) {
+                    delete selectedImagesById[imageId];
+                } else {
+                    console.warn("Unknown image id ", imageId);
+                }
+            },
+            stop: function(event, ui) {
+                console.log(selectedImagesById);
+            }
         });
     };
 
@@ -119,12 +185,11 @@ function Menu() {
 
 function TagAdminUI(adminApi, imageApi, tag) {
     var self = this;
+    var imagesById = {};
     var onImageSelectedCallback = function() {};
 
     var container = div("tag-admin-container");
-
     var nameField = textInputElem("tag", tag, "tag-name-field propValue");
-
     var nameSpan = $('<span/>');
     nameSpan.append(nameField);
 
@@ -171,6 +236,7 @@ function TagAdminUI(adminApi, imageApi, tag) {
         images.forEach(function(image) {
             var thumbnailUIElement = self.createThumbnailImage(image);
             imageList.append(thumbnailUIElement);
+            imagesById[image.id] = image;
         });
     };
 
@@ -179,6 +245,7 @@ function TagAdminUI(adminApi, imageApi, tag) {
         var thumbImageElem = img(thumbnail.src);
         thumbImageElem.attr("data-toggle", "modal");
         thumbImageElem.attr("data-target", "#image-modal");
+        thumbImageElem.attr("data-imageId", image.id);
         thumbImageElem.click(function() {
             self.selectImage(image);
         });
@@ -189,6 +256,10 @@ function TagAdminUI(adminApi, imageApi, tag) {
 
     this.selectImage = function(image) {
         onImageSelectedCallback(image);
+    };
+
+    this.getImageById = function(imageId) {
+        return imagesById[imageId];
     };
 }
 
@@ -384,7 +455,6 @@ function PropertiesEditor(adminApi, image) {
 }
 
 $(document).ready(function() {
-
     var modal = $('#image-modal');
 
     var imageApi = new ImageApi(baseImageContentServicePath);
@@ -392,10 +462,6 @@ $(document).ready(function() {
     var adminUI = new AdminUI(adminApi, imageApi, modal);
 
     $('body').append(adminUI.buildUI());
-
-    $(document).bind('drop dragover', function (e) {
-        e.preventDefault();
-    });
 
     adminUI.load();
 });

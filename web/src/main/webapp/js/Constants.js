@@ -53,6 +53,10 @@ function textareaElem(name, value, css) {
 }
 
 function notify(msg) {
-    alert(msg);
+    $('#message').fadeIn(100);
+    $('#message').text(msg);
+    setTimeout(function() {
+        $('#message').fadeOut(300);
+    }, 3000);
 }
 

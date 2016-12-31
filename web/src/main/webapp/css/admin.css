@@ -5,6 +5,16 @@ body {
     font-size: 11px;
 }
 
+#message {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    font-size: 18px;
+    background-color: rgba(0, 200, 0, .7);
+    z-index: 10000;
+}
 .loader {
     position: fixed;
     top: 0;
@@ -28,6 +38,19 @@ body {
 .tag-admin-image-list {
     background-color: black;
     margin-left: 3px;
+}
+
+.tag-admin-image-list .ui-selecting {
+    border: 3px solid yellow;
+}
+
+.tag-admin-image-list .ui-selected {
+    border: 3px solid dodgerblue;
+}
+
+.tag-admin-image-list img {
+    margin: 3px;
+    border: 3px solid black;
 }
 
 .tag-name-field {

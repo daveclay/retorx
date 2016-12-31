@@ -87,11 +87,11 @@ function AdminApi(baseServicePath) {
     };
 
     this.saveProperties = function(image, properties, callback) {
-        ajax.postJson({
+        return ajax.postJson({
             url: "/" + image.name + "/properties",
             data: JSON.stringify(properties),
             success: function() {
-                notify("saved.");
+                notify("saved " + image.name);
                 callback(properties);
             }
         });

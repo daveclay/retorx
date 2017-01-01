@@ -1,3 +1,51 @@
+function makeModalButton(elem) {
+    elem.attr("data-toggle", "modal");
+    elem.attr("data-target", "#image-modal");
+}
+
+function Menu() {
+    var self = this;
+
+    var container = div('admin-menu-container');
+    var menuItemContainer = div('admin-menu-item-container');
+
+    container.append(menuItemContainer);
+
+    var menuItems = [];
+
+    this.buildUI = function() {
+        return container;
+    };
+
+    this.getElement = function() {
+        return container;
+    };
+
+    this.addItem = function(name, callback) {
+        var itemDiv = div('admin-menu-item');
+        itemDiv.text(name);
+        menuItemContainer.append(itemDiv);
+
+        var item = {
+            name: name,
+            callback: callback,
+            elem: itemDiv
+        };
+
+        itemDiv.click(function() {
+            callback(item, itemDiv);
+        });
+
+        menuItems.push(item);
+        return item;
+    };
+
+    this.removeItem = function(item) {
+        menuItems.remove(item);
+        item.elem.remove();
+    };
+}
+
 function PropertiesApi(image, adminApi) {
 
     this.foreachProperty = function(callback) {
@@ -63,12 +111,16 @@ function AdminUI(adminApi, imageApi, modal) {
         }
     });
 
-    menu.addItem("mark selected as hidden", function() {
+    menu.addItem("hide selected", function() {
         loader.show();
         tagAdminUIs.forEach(function(tagAdminUI) {
             tagAdminUI.markSelectedAsHidden();
         });
     });
+
+    makeModalButton(menu.addItem("edit selected", function() {
+        self.editSelected();
+    }).elem);
 
     var menuElem = menu.buildUI();
     container.append(menuElem);
@@ -90,8 +142,29 @@ function AdminUI(adminApi, imageApi, modal) {
         });
     };
 
+    this.editSelected = function() {
+        var modalBody = modal.find('.modal-body');
+        modalBody.empty();
+
+        var nameField = textInputElem("name", "", "property-editor-name-field");
+        var valueField = textInputElem("value", "", "property-editor-value-field");
+        valueField.addClass("propValue");
+
+        modalBody.append(nameField);
+        modalBody.append(valueField);
+
+        var saveButton = $('<button type="button" class="btn btn-primary">Save</button>');
+        saveButton.click(function() {
+            tagAdminUIs.forEach(function(tagAdminUI) {
+                tagAdminUI.saveSelectedImagesProperties();
+            });
+        });
+        modal.find("#modal-actions").empty();
+        modal.find("#modal-actions").append(saveButton);
+    };
+
     this.handleTag = function(tag) {
-        var tagAdminUI = new TagAdminUI(adminApi, imageApi, tag);
+        var tagAdminUI = new TagAdminUI(adminApi, imageApi, tag, modal);
         var sectionElem = tagAdminUI.buildUI();
         tagAdminUIsContainer.append(sectionElem);
 
@@ -111,7 +184,6 @@ function AdminUI(adminApi, imageApi, modal) {
     };
 
     this.disableSelection = function() {
-        selectedImagesById = {};
         tagAdminUIs.forEach(function(tagAdminUI) {
             tagAdminUI.disableSelection();
         });
@@ -130,55 +202,11 @@ function AdminUI(adminApi, imageApi, modal) {
     };
 }
 
-function Menu() {
-    var self = this;
-
-    var container = div('admin-menu-container');
-    var menuItemContainer = div('admin-menu-item-container');
-
-    container.append(menuItemContainer);
-
-    var menuItems = [];
-
-    this.buildUI = function() {
-        return container;
-    };
-
-    this.getElement = function() {
-        return container;
-    };
-
-    this.addItem = function(name, callback) {
-        var itemDiv = div('admin-menu-item');
-        itemDiv.text(name);
-        menuItemContainer.append(itemDiv);
-
-        var item = {
-            name: name,
-            callback: callback,
-            elem: itemDiv
-        };
-
-        itemDiv.click(function() {
-            callback(item, itemDiv);
-        });
-
-        menuItems.push(item);
-        return item;
-    };
-
-    this.removeItem = function(item) {
-        menuItems.remove(item);
-        item.elem.remove();
-    };
-}
-
-function TagAdminUI(adminApi, imageApi, tag) {
+function TagAdminUI(adminApi, imageApi, tag, modal) {
     var self = this;
     var imagesById = {};
 
     var selectedImagesById = {};
-    var sectionElements = [];
 
     var onImageSelectedCallback = function() {};
 
@@ -240,9 +268,8 @@ function TagAdminUI(adminApi, imageApi, tag) {
         if (image.properties["hidden"]) {
             thumbImageElem.addClass("hidden-image");
         }
-        thumbImageElem.attr("data-toggle", "modal");
-        thumbImageElem.attr("data-target", "#image-modal");
         thumbImageElem.attr("data-imageId", image.id);
+        makeModalButton(thumbImageElem);
         thumbImageElem.click(function() {
             self.selectImage(image);
         });
@@ -298,12 +325,20 @@ function TagAdminUI(adminApi, imageApi, tag) {
             properties['hidden'] = true;
             return propertiesApi.saveProperties(properties);
         });
-    }
-}
+    };
 
-function ModalButton(title, action) {
-    var button = $('<button type="button" class="btn btn-primary">' + title  + '</button>');
-    button.click(action);
+    this.saveSelectedImagesProperties = function() {
+        $("#loader").show();
+        var modalBody = modal.find('.modal-body');
+        var name = modalBody.find("input[name='name']").val();
+        var value = modalBody.find("input[name='value']").val();
+        return Object.values(selectedImagesById).map(function(image) {
+            var propertiesApi = new PropertiesApi(image, adminApi);
+            var properties = propertiesApi.getProperties();
+            properties[name] = value;
+            return propertiesApi.saveProperties(properties);
+        });
+    }
 }
 
 function ImageAdminUI(adminApi, image, modal) {

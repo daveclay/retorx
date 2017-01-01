@@ -237,6 +237,9 @@ function TagAdminUI(adminApi, imageApi, tag) {
     this.createThumbnailImage = function(image) {
         var thumbnail = image.findImageFileByName("thumbnail");
         var thumbImageElem = img(thumbnail.src);
+        if (image.properties["hidden"]) {
+            thumbImageElem.addClass("hidden-image");
+        }
         thumbImageElem.attr("data-toggle", "modal");
         thumbImageElem.attr("data-target", "#image-modal");
         thumbImageElem.attr("data-imageId", image.id);

@@ -76,14 +76,12 @@ class ImageContentData(originalImageFile: File) {
 
 	private def addProperty(name: String, value: String) {
 		properties.get(name) match {
-			case Some(currentValue) => {
+			case Some(currentValue) =>
 				if (!currentValue.equalsIgnoreCase(value)) {
 					setPropertyValue(name, value)
 				}
-			}
-			case None => {
+			case None =>
 				setPropertyValue(name, value)
-			}
 		}
 	}
 
@@ -93,10 +91,7 @@ class ImageContentData(originalImageFile: File) {
 	}
 
 	private def findName() = {
-		properties.get("name") match {
-			case name: Some[String] => name.get
-			case None => FileUtil.getNameWithoutExtensionFromFile(originalImageFile)
-		}
+		FileUtil.getNameWithoutExtensionFromFile(originalImageFile)
 	}
 
 	private def findImageDate() = {
@@ -104,11 +99,10 @@ class ImageContentData(originalImageFile: File) {
 		properties.get("date") match {
 			case Some(dateString) =>
 				format.parse(dateString)
-			case None => {
+			case None =>
 				val date = new Date(originalImageFile.lastModified)
 				setPropertyValue("date", format.format(date))
 				date
-			}
 		}
 	}
 

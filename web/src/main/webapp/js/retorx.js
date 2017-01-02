@@ -11,7 +11,7 @@ var tagInfo = {
         "environment. The figures drift in and out of abstract, ambient textures rather than existing in a well defined " +
         "space.\"</i>",
 
-    "abstract":
+    "abstracts":
         "<i>\"Abstraction is always at the edge of even my figurative works. I realized that I wasn't interested " +
         "in literal transcriptions or realism. I want to reflect a broader context of the environment that we live in." +
         "\"</i> The abstract pieces here represent experiments and studies, elements that may be brought into the figurative works.",

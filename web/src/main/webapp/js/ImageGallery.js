@@ -139,15 +139,11 @@ function ImageGallery(imageApi, loader) {
         });
     };
 
-    this.createImageCaption = function(image) {
-        return image.name;
-    };
-
     this.createImageCaptionElement = function (image) {
         var caption = $('<span/>');
         var nameElement = $('<span/>');
         nameElement.addClass("imageName");
-        nameElement.text(image.name);
+        nameElement.text(image.properties["name"] || image.name);
         caption.append(nameElement);
 
         caption.append($("<span> / </span>"));

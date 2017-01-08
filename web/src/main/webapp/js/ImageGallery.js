@@ -1,8 +1,6 @@
-function ImageGallery(imageApi, loader) {
+function ImageGallery(imageApi, loader, thumbnailsElem) {
     var self = this;
-
     var containerElem = $('#photoswipe');
-    var thumbnailsElem = $('#thumbnails');
 
     this.getElement = function() {
         return containerElem;
@@ -34,34 +32,36 @@ function ImageGallery(imageApi, loader) {
         if (items == null) {
             items = this.imageObjects;
         }
+
+        var options = {
+            galleryPIDs: true
+        };
+
+        if (index) {
+            options.index = index;
+            options.showHideOpacity = true;
+            options.getThumbBoundsFn = function(index) {
+                // find thumbnail element
+                var thumbnail = document.querySelectorAll('#thumbnails img')[index];
+                // get window scroll Y
+                var pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
+                // optionally get horizontal scroll
+                // get position of element relative to viewport
+                var rect = thumbnail.getBoundingClientRect();
+                // w = width
+                return {x: rect.left, y: rect.top + pageYScroll, w: rect.width};
+                // Good guide on how to get element coordinates:
+                // http://javascript.info/tutorial/coordinates
+            }
+        }
+
         var gallery = new PhotoSwipe(
             containerElem[0],
             PhotoSwipeUI_Default,
             items,
-            {
-                galleryPIDs: true,
-                index: index,
-                showHideOpacity: true,
-                getThumbBoundsFn: function(index) {
+            options
+        );
 
-                    // find thumbnail element
-                    var thumbnail = document.querySelectorAll('#thumbnails img')[index];
-
-                    // get window scroll Y
-                    var pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
-                    // optionally get horizontal scroll
-
-                    // get position of element relative to viewport
-                    var rect = thumbnail.getBoundingClientRect();
-
-                    // w = width
-                    return {x:rect.left, y:rect.top + pageYScroll, w:rect.width};
-
-
-                    // Good guide on how to get element coordinates:
-                    // http://javascript.info/tutorial/coordinates
-                }
-            });
         gallery.init();
     };
 

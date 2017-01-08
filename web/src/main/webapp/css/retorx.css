@@ -59,11 +59,11 @@ body {
     padding-bottom: 15px;
 }
 
-#thumbnails {
+#content {
     display: inline-block;
 }
 
-#thumbnails img {
+#content img {
     border-color: #242527;
     border-style: solid;
 }
@@ -80,29 +80,21 @@ body {
 
 @media only screen and (max-width: 768px) {
 
-    #thumbnails {
+    #content {
         text-align: center;
     }
 
-    #thumbnails img {
+    #content img {
         margin: 20px 8px 10px 8px;
         border-width: 5px;
     }
 }
 
 @media only screen and (min-width: 768px) {
-    #thumbnails img {
+    #content img {
         margin: 0 32px 32px 0;
         border-width: 8px;
     }
-}
-
-#content {
-    display: inline-block;
-    top: 1em;
-    padding: 0;
-    margin: 0 auto;
-    vertical-align: top;
 }
 
 .navbar-menu-container {
@@ -213,19 +205,31 @@ a:hover {
     top: 0;
 }
 
-.about {
-    font-size: 13px;
-    color: #9a9a9a;
-    width: 300px;
+#about {
+    display: none;
+    top: 1em;
+    padding: 0;
+    margin: 0 auto;
+    vertical-align: top;
+    text-align: left;
 }
 
-.about a {
+#about a {
     color: white;
     text-decoration: none;
 }
 
-.about a:hover {
+#about a:hover {
     text-decoration: underline;
+}
+
+.about-img {
+    width: 100%;
+    margin: 0 !important;
+}
+
+#about-text {
+    padding-top: 15px;
 }
 
 .closeButton {

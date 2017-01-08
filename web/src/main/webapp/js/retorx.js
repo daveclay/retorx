@@ -33,6 +33,7 @@ var initialTag = "figure painting";
 
 $(document).ready(function() {
     var body = $('body');
+    var contentElem = $('#content');
     var tagInfoElem = $('#tag-text');
 
     var sidebarMenuElem = $('#sidebar-menu');
@@ -49,10 +50,10 @@ $(document).ready(function() {
     sidebarTagMenu.load();
     navbarTagMenu.load();
 
-    var imageGallery = new ImageGallery(imageApi, loader);
+    var imageGallery = new ImageGallery(imageApi, loader, contentElem);
     body.append(imageGallery.getElement());
 
-    var about = new AboutInfo(baseServicePath);
+    var about = new AboutInfo(baseServicePath, contentElem);
     about.load();
 
     var tagSelected = function(tag) {
@@ -60,8 +61,10 @@ $(document).ready(function() {
         loader.show();
         imageGallery.clear();
         tagInfoElem.html(tagInfo[tag] || "");
+        contentElem.empty();
         if (tag == "about") {
-            imageGallery.showGallery(about.buildElement());
+            loader.hide();
+            about.show();
         } else {
             imageGallery.loadImagesForTag(tag);
         }

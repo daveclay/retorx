@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>retorx-web</artifactId>
-    <version>1.2.12-SNAPSHOT</version>
+    <version>1.2.12</version>
     <packaging>war</packaging>
 
     <name>web</name>
@@ -10,7 +10,7 @@
 	<parent>
     <groupId>net.retorx</groupId>
 		<artifactId>retorx</artifactId>
-    <version>1.2.12-SNAPSHOT</version>
+    <version>1.2.12</version>
 		<relativePath>../</relativePath>
 	</parent>
 
@@ -23,12 +23,12 @@
         <dependency>
             <groupId>net.retorx</groupId>
             <artifactId>rip</artifactId>
-            <version>1.2.12-SNAPSHOT</version>
+            <version>1.2.12</version>
         </dependency>
         <dependency>
             <groupId>net.retorx</groupId>
             <artifactId>core</artifactId>
-            <version>1.2.12-SNAPSHOT</version>
+            <version>1.2.12</version>
         </dependency>
         <!--
         <dependency>

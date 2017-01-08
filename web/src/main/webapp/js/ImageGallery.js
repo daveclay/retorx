@@ -42,7 +42,7 @@ function ImageGallery(imageApi, loader, thumbnailsElem) {
             options.showHideOpacity = true;
             options.getThumbBoundsFn = function(index) {
                 // find thumbnail element
-                var thumbnail = document.querySelectorAll('#thumbnails img')[index];
+                var thumbnail = document.querySelectorAll('#content img')[index];
                 // get window scroll Y
                 var pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
                 // optionally get horizontal scroll

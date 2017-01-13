@@ -63,6 +63,8 @@ function ImageGallery(imageApi, loader, thumbnailsElem) {
         this.imageArray = [];
         this.imageObjects = [];
 
+        window.location.hash = "&gid=" + tag;
+
         var createThumbnail = function(imageData) {
             var thumbnailElem = $('<img/>');
             var file = imageData.findImageFileByName("thumbnail");

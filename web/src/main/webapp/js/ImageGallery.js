@@ -12,29 +12,18 @@ function ImageGallery(imageApi, loader, thumbnailsElem) {
         }.bind(this));
     };
 
-    this.loadLatestImages = function () {
-        imageApi.loadLatestImagesAnd(function (images) {
-            var image = images[0];
-            console.log(image);
-            this.handleLoadImages(tag, images);
-        }.bind(this));
-    };
-
-    this.setCurrentTag = function (tag) {
-        this.currentTag = tag;
-    };
-
     this.clear = function() {
         thumbnailsElem.empty();
     };
 
-    this.showGallery = function(items, index) {
+    this.showGallery = function(tag, items, index) {
         if (items == null) {
             items = this.imageObjects;
         }
 
         var options = {
-            galleryPIDs: true
+            galleryPIDs: true,
+            galleryUID: tag
         };
 
         if (index) {
@@ -70,9 +59,6 @@ function ImageGallery(imageApi, loader, thumbnailsElem) {
             log("No images present.");
             return;
         }
-        var image = images.peek();
-        var tagObject = image.tags.peek();
-        this.setCurrentTag(tagObject);
 
         this.imageArray = [];
         this.imageObjects = [];
@@ -90,7 +76,7 @@ function ImageGallery(imageApi, loader, thumbnailsElem) {
                 thumbnailElem.removeClass("transparent");
             });
             thumbnailElem.click(function() {
-                self.showGallery(null, imageData.index);
+                self.showGallery(tag, null, imageData.index);
             });
 
             return thumbnailElem;

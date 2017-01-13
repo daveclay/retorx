@@ -5,7 +5,8 @@ function ImageApi(baseImageContentServicePath) {
     var self = this;
 
     this.get = function(url, callback) {
-        $.getJSON(baseImageContentServicePath + url, callback);
+        return $.getJSON(baseImageContentServicePath + url)
+            .success(callback);
     };
 
     this.loadAllTagsAnd = function(callback) {
@@ -13,7 +14,7 @@ function ImageApi(baseImageContentServicePath) {
     };
 
     this.loadImagesForTagAnd = function(tag, callback) {
-        this.get("tag/" + tag, function(images) {
+        return this.get("tag/" + tag).success(function(images) {
             images.forEach(function(image) {
                 self.calculateImageProperties(image);
             });

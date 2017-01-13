@@ -7,7 +7,7 @@ function ImageGallery(imageApi, loader, thumbnailsElem) {
     };
 
     this.loadImagesForTag = function (tag) {
-        imageApi.loadImagesForTagAnd(tag, function (images) {
+        return imageApi.loadImagesForTagAnd(tag, function (images) {
             this.handleLoadImages(tag, images);
         }.bind(this));
     };
@@ -120,7 +120,7 @@ function ImageGallery(imageApi, loader, thumbnailsElem) {
     };
 
     this.findImageById = function (id) {
-        return this.images.find(function (image) {
+        return this.imageArray.find(function (image) {
             return image.id == id;
         });
     };

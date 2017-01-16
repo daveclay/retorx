@@ -48,7 +48,7 @@ function textareaElem(name, value, css) {
     var elem = $("<textarea/>");
     if (css) elem.addClass(css);
     elem.attr("name", name);
-    elem.attr("value", value);
+    elem.append(value);
     return elem;
 }
 

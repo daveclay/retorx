@@ -144,6 +144,7 @@ body {
 #navbar-menu li {
     list-style: none;
     margin-top: 10px;
+    font-size: 1.3em;
 }
 
 #navbar-menu li:first-child {

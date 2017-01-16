@@ -170,6 +170,11 @@ body {
 #sidebar-menu li {
     display: block;
     margin-top: 2px;
+    padding-top: 4px;
+}
+
+.menu li.active-menu-item a {
+    color: white;
 }
 
 .menu li a {

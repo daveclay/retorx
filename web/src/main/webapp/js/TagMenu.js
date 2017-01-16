@@ -8,14 +8,7 @@ function TagMenu(imageApi, parentElement) {
     parentElement.append(this.container);
 
     this.tagMenuItems = [];
-    this.currentTag = null;
     this.onTagSelectedEventHandler = function() { };
-
-    this.load = function () {
-        imageApi.loadAllTagsAnd(function(tags) {
-            self.handleLoadAllTags(tags);
-        });
-    };
 
     this.onTagSelected = function (eventHandler) {
         this.onTagSelectedEventHandler = eventHandler;
@@ -24,7 +17,7 @@ function TagMenu(imageApi, parentElement) {
     this.handleLoadAllTags = function (tags) {
         tags.forEach(function (tag) {
             self.addTag(tag, function () {
-                self.tagWasSelected(tag);
+                self.onTagSelectedEventHandler(tag);
             });
         });
 
@@ -33,13 +26,11 @@ function TagMenu(imageApi, parentElement) {
         });
     };
 
-    this.setCurrentTag = function (tag) {
-        this.currentTag = tag;
-    };
-
-    this.tagWasSelected = function (tag) {
-        this.setCurrentTag(tag);
-        this.onTagSelectedEventHandler(tag);
+    this.indicateSelectedTag = function(tag) {
+        var selectedTagMenuItem = this.tagMenuItems.find(function(tagMenuItem) {
+            return tagMenuItem.name == tag
+        });
+        selectedTagMenuItem.active();
     };
 
     this.addTag = function (tag, callback) {
@@ -62,7 +53,8 @@ function TagMenuItem(name, menu, callback) {
 	this.linkUI.attr("id", "tag" + this.name);
 
 	this.linkUI.click(function () {
-		callback();
+        self.active();
+		callback(this);
 	});
 
     var linkText = $('<span/>');

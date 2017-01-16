@@ -7,14 +7,14 @@
 
 	<groupId>net.retorx</groupId>
 	<artifactId>retorx</artifactId>
-	<version>1.2.17-SNAPSHOT</version>
+	<version>1.2.17</version>
 	<packaging>pom</packaging>
 
     <scm>
         <connection>scm:git:git@github.com:daveclay/retorx.git</connection>
         <url>scm:git:git@github.com:daveclay/retorx.git</url>
         <developerConnection>scm:git:git@github.com:daveclay/retorx.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>retorx-1.2.17</tag>
   </scm>
 
     <distributionManagement>

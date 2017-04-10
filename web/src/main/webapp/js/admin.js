@@ -264,10 +264,14 @@ function TagAdminUI(adminApi, imageApi, tag, modal) {
 
     this.createThumbnailImage = function(image) {
         var thumbnail = image.findImageFileByName("thumbnail");
-        var thumbImageElem = img(thumbnail.src);
+        var thumbImageElem = img(thumbnail.src, "transparent");
         if (image.properties["hidden"]) {
             thumbImageElem.addClass("hidden-image");
         }
+        thumbImageElem.one("load", function() {
+            thumbImageElem.addClass("fadeIn");
+            thumbImageElem.removeClass("transparent");
+        });
         thumbImageElem.attr("data-imageId", image.id);
         makeModalButton(thumbImageElem);
         thumbImageElem.click(function() {

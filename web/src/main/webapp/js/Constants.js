@@ -20,6 +20,8 @@ function div(cssClass) {
 function img(src, cssClass) {
     var img = $('<img/>');
     if (src) img.attr("src", src);
+    img.attr("width", "100");
+    img.attr("height", "100");
     if (cssClass) img.addClass(cssClass);
     return img;
 }

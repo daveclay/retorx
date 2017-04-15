@@ -146,6 +146,10 @@ class ImageContentDAO @Inject()(var imageContentLibrary: ImageContentLibrary) {
 		}
 	}
 
+	def getVisibleTags = {
+		getTags.filter { tag => getVisibleImageContentByTag(tag).nonEmpty }
+	}
+
 	def createTagImage(tag: String) = {
 		None
 	}
@@ -163,8 +167,12 @@ class ImageContentDAO @Inject()(var imageContentLibrary: ImageContentLibrary) {
 
 	def getImageContentByTag(tag: String) = {
 		withImageContentLibrary { imageContentLibrary =>
-			imageContentLibrary.imageContentByTag.getOrElse(tag, TreeSet[ImageContent]())
+			imageContentLibrary.imageContentByTag.getOrElse(tag, TreeSet[ImageContent]()
 		}
+	}
+
+	def getVisibleImageContentByTag(tag: String) = {
+		getImageContentByTag(tag).filterNot { image => image.isHidden }
 	}
 
 	def getAllImageContent = {

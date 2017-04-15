@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/">
 	<Parameter name="content.dir" value="/Users/daveclay/work/retorx/content"/>
+    <Valve className="org.apache.catalina.valves.rewrite.RewriteValve" />
 </Context>

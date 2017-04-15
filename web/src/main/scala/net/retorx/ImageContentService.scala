@@ -14,7 +14,7 @@ class ImageContentService @Inject() (imageContentDAO:ImageContentDAO) {
 	@Path("/tags")
 	@Produces(Array("text/json"))
 	def getTags = {
-		imageContentDAO.getTags
+		imageContentDAO.getVisibleTags
 	}
 
     @NoCache

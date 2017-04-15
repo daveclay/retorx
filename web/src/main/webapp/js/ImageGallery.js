@@ -32,6 +32,7 @@ function ImageGallery(imageApi, loader, tagInfoElem, thumbnailsElem) {
 
     var self = this;
     var containerElem = $('#photoswipe');
+    var gallery;
 
     this.getElement = function() {
         return containerElem;
@@ -74,10 +75,32 @@ function ImageGallery(imageApi, loader, tagInfoElem, thumbnailsElem) {
                 return {x: rect.left, y: rect.top + pageYScroll, w: rect.width};
                 // Good guide on how to get element coordinates:
                 // http://javascript.info/tutorial/coordinates
+            },
+            // {id:'facebook', label:'Share on Facebook', url:'https://www.facebook.com/sharer/sharer.php?u={{url}}&picture={{raw_image_url}}&description={{text}}'}
+            options.getImageURLForShare = function(shareButtonData) {
+                console.log(shareButtonData);
+                var currentImage = gallery.currItem;
+                var imageData = currentImage.retorxData;
+                var original = imageData.findImageFileByName("original");
+                var pictureUrl = original.src;
+                var description = imageData.name;
+                var tag = imageData.tags[0];
+                var id = imageData.id;
+                var shareUrl = "http://daveclay.com/art/" + tag + "/" + id;
+
+                // TODO: this is hard-coded to fb
+                var shareData = {
+                    id: 'facebook',
+                    label: 'Share on Facebook',
+                    url: 'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl + '&picture=' + pictureUrl + '&description=' + description
+                };
+
+                return shareData;
             }
+
         }
 
-        var gallery = new PhotoSwipe(
+        gallery = new PhotoSwipe(
             containerElem[0],
             PhotoSwipeUI_Default,
             items,
@@ -150,6 +173,7 @@ function ImageGallery(imageApi, loader, tagInfoElem, thumbnailsElem) {
             w: scaled.width,
             h: scaled.height,
             title: this.createImageCaptionElement(image).html(),
+            retorxData: image,
             pid: image.id
         };
     };

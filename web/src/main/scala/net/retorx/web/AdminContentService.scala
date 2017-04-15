@@ -1,6 +1,7 @@
 package net.retorx.web
 
 import javax.ws.rs._
+
 import com.google.inject.{Inject, Singleton}
 import net.retorx.images.ImageContentDAO
 import net.retorx.config.SiteContentService
@@ -8,6 +9,8 @@ import org.jboss.resteasy.spi.NotFoundException
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput
 import org.apache.commons.io.IOUtils
 import java.io.{File, FileOutputStream}
+
+import org.jboss.resteasy.annotations.cache.NoCache
 
 @Path("/admin")
 @Singleton
@@ -17,6 +20,14 @@ class AdminContentService @Inject()(imageContentDAO: ImageContentDAO,
 	val multipartHandler = new MultipartHandler()
 
 	def successJson = """{"success":true}"""
+
+	@NoCache
+	@GET
+	@Path("/tags")
+	@Produces(Array("text/json"))
+	def getTags = {
+		imageContentDAO.getTags
+	}
 
 	@POST
 	@Path("/css")

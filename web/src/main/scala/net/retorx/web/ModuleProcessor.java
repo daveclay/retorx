@@ -1,7 +1,7 @@
 package net.retorx.web;
 
 import com.google.inject.*;
-import org.jboss.resteasy.logging.Logger;
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.plugins.guice.GuiceResourceFactory;
 import org.jboss.resteasy.spi.Registry;
 import org.jboss.resteasy.spi.ResourceFactory;
@@ -27,7 +27,7 @@ public class ModuleProcessor
    public Injector process(final Module... modules)
    {
       final Injector injector = Guice.createInjector(modules);
-      processInjector(injector);
+      // processInjector(injector);
        return injector;
    }
 
@@ -42,12 +42,12 @@ public class ModuleProcessor
             if (GetRestful.isRootResource(beanClass))
             {
                final ResourceFactory resourceFactory = new GuiceResourceFactory(binding.getProvider(), beanClass);
-               logger.info("registering factory for {0}", beanClass.getName());
+               logger.info("registering factory for " + beanClass.getName());
                registry.addResourceFactory(resourceFactory);
             }
             if (beanClass.isAnnotationPresent(Provider.class))
             {
-               logger.info("registering provider instance for {0}", beanClass.getName());
+               logger.info("registering provider instance for " + beanClass.getName());
                providerFactory.registerProviderInstance(binding.getProvider().get());
             }
          }

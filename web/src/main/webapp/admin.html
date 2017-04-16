@@ -2,55 +2,83 @@
 <!-- the arrangement of the atoms in the crystal lattice, creating lasting damage, and increasing the number of recombination centers, depleting the minority carriers and worsening the analog properties of the affected semiconductor junctions. http://en.wikipedia.org/wiki/Radiation_hardened -->
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<meta name="keywords" content="daveclay, art, retorx, figure, drawing, pen, ink">
-<meta name="description" content="art and design of daveclay">
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<title>daveclay/art</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="keywords" content="daveclay, art, retorx, figure, drawing, pen, ink">
+  <meta name="description" content="art and design of daveclay">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>daveclay/art</title>
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<link type="text/css" href="css/admin.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script type="text/javascript" src="js/lib/jquery.ui.widget.js"></script>
-<script type="text/javascript" src="js/lib/jquery.iframe-transport.js"></script>
-<script type="text/javascript" src="js/lib/jquery.fileupload.js"></script>
+  <style type="text/css">
+    .selection {
+      margin: 5px;
+    }
+    .selection .item {
+      border: 1px solid lightgray;
+      padding: 5px;
+      margin: 2px;
+      width: 200px;
+      height: 200px;
+      display: inline-block;
+    }
 
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script type="text/javascript" src="js/Array.retorx.js"></script>
-<script type="text/javascript" src="js/LinkedList.js"></script>
-<script type="text/javascript" src="js/TagMenu.js"></script>
-<script type="text/javascript" src="js/HashLinkMap.js"></script>
-<script type="text/javascript" src="js/date.format.js"></script>
-<script type="text/javascript" src="js/Constants.js"></script>
-<script type="text/javascript" src="js/ImageApi.js"></script>
-<script type="text/javascript" src="js/AdminApi.js"></script>
-<script type="text/javascript" src="js/ImageRotator.js"></script>
-<script type="text/javascript" src="js/admin.js"></script>
+
+    /* item box */
+    .select-box {
+      width: 200px;
+      background: #f0f0f0;
+      text-align: center;
+      display: inline-block;
+      margin: 5px;
+      border-radius: 5px;
+      font-size: 12px;
+      color: #5A5A5A;
+      box-sizing: border-box;
+    }
+    /* selected item box */
+    .select-box.selected {
+      background: #64B5F6;
+    }
+    /* selection container */
+    .selection {
+      position: relative;
+    }
+
+    /* selection box */
+    .selection-border {
+      background: rgba(0, 162, 255, 0.4);
+      position: fixed;
+      z-index: 99;
+    }
+
+    .selection span.select-box.selected {
+      background-color: #ffd0ad;
+    }
+
+
+    .fadeIn {
+      transition: opacity .55s ease-in-out;
+      -moz-transition: opacity .55s ease-in-out;
+      -webkit-transition: opacity .55s ease-in-out;
+    }
+
+    .transparent {
+      opacity: 0;
+    }
+
+    img.hidden-image {
+      opacity: .3;
+    }
+
+  </style>
 </head>
 <body>
-<div id="loader">loading...</div>
-<div id="message"></div>
-
-<div id="content"></div>
-
-<div id="image-modal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"></h4>
-            </div>
-            <div class="modal-body">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <span id="modal-actions"></span>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+<div id="root"></div>
+<script type="text/javascript" src="js/admin.bundle.js"></script>
 </body>
 </html>

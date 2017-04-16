@@ -3,3 +3,6 @@ content
 retorx.iml
 *.iml
 target
+web/node_modules/*
+web/src/main/webapp/js/admin.bundle.js
+web/src/main/webapp/js/main.bundle.js

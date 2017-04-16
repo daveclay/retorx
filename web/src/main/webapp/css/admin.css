@@ -94,16 +94,6 @@ body {
     max-width: 100%;
 }
 
-.fadeIn {
-    transition: opacity .55s ease-in-out;
-    -moz-transition: opacity .55s ease-in-out;
-    -webkit-transition: opacity .55s ease-in-out;
-}
-
-.transparent {
-    opacity: 0;
-}
-
 .thumb-image-container {
 }
 

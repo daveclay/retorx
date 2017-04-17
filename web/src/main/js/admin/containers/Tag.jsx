@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { imagesSelected, thumbnailLoaded } from "../actions/actions"
+import { imagesSelected, editImages } from "../actions/actions"
 import { loadImagesForTag } from "../../main/actions/imageApiActions"
 import Tag from "../components/Tag"
 
@@ -18,12 +18,12 @@ const mapDispatchToProps = (dispatch) => {
     onLoad: (tag) => {
       dispatch(loadImagesForTag(tag))
     },
-    onThumbnailLoaded: (image) => {
-      dispatch(thumbnailLoaded(image))
-    },
     onImagesSelected: (images) => {
       dispatch(imagesSelected(images))
     },
+    onDoubleClickImages: (images) => {
+      dispatch(editImages(images))
+    }
   }
 }
 

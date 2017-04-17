@@ -120,7 +120,12 @@ class ImageContentData(originalImageFile: File) {
 		}
 		val unsortedMap = propertiesAsScalaMap(properties)
 		unsortedMap.foldLeft(new TreeMap[String, String]()) {
-			(map, entry) => map + entry
+			(map, entry) =>
+				if (entry._1.length == 0) {
+					map
+				} else {
+					map + entry
+				}
 		}
 	}
 

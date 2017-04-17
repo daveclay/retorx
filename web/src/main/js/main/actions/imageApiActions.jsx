@@ -61,6 +61,6 @@ export const imagesLoaded = (tag, images) => {
 export const imageLoaded = (image) => {
   return {
     type: "IMAGE_LOADED",
-    image: transformImage(image)
+    image: image
   }
 }

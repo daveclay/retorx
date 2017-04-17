@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { menuItemSelected } from "../actions/actions"
 
 import Menu from "../components/Menu"
 
@@ -13,7 +12,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     onSelect: function(menuItem) {
-      dispatch(menuItemSelected(menuItem))
+      dispatch(menuItem.get("action")())
     }
   }
 }

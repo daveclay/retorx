@@ -47,24 +47,24 @@ class AdminContentService @Inject()(imageContentDAO: ImageContentDAO,
 	}
 
 	@POST
-	@Path("{id}/properties")
+	@Path("{name}/properties")
 	@Consumes(Array("text/json", "application/json", "application/vnd.imageContent+json"))
 	@Produces(Array("application/vnd.imageContent+json"))
-	def saveProperties(@PathParam("id") id: String, properties: java.util.Map[String, String]) = {
-		val imageContent = imageContentDAO.getImageContent(id)
+	def saveProperties(@PathParam("name") name: String, properties: java.util.Map[String, String]) = {
+		val imageContent = imageContentDAO.getImageContent(name)
 		val wrapped = scala.collection.JavaConversions.mapAsScalaMap(properties)
 		imageContent.setProperties(wrapped.toMap)
 		imageContent.savePropertiesFile()
 		// a little overzealous, but whatever - how long does it take to determine whether tags have changed vs
 		// just reloading the damned tags?
 		imageContentDAO.reloadTags()
-		successJson
+		imageContent
 	}
 
 	@DELETE
-	@Path("/image/{id}/{name}.png")
-	def deleteImageFile(@PathParam("id") id: String, @PathParam("name") name: String) = {
-		val imageContent = imageContentDAO.getImageContent(id)
+	@Path("/image/{name}.png")
+	def deleteImageFile(@PathParam("name") name: String) = {
+		val imageContent = imageContentDAO.getImageContent(name)
 		imageContent.getImageFileByVersion(name) match {
 			case Some(imageFile) =>
 				imageContentDAO.deleteImageFileForImage(imageContent, imageFile)
@@ -75,11 +75,10 @@ class AdminContentService @Inject()(imageContentDAO: ImageContentDAO,
 	}
 
 	@PUT
-	@Path("/image/{id}/{name}.png")
-	def replaceImageFile(@PathParam("id") id: String,
-						 @PathParam("name") name: String,
+	@Path("/image/{name}.png")
+	def replaceImageFile(@PathParam("name") name: String,
 						 input: MultipartFormDataInput) = {
-		val imageContent = imageContentDAO.getImageContent(id)
+		val imageContent = imageContentDAO.getImageContent(name)
 		imageContent.getImageFileByVersion(name) match {
 			case Some(imageFile) =>
 				multipartHandler.handleMultipartData(input, (filename, inputStream) => {

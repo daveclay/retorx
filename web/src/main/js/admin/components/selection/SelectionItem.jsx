@@ -3,9 +3,9 @@ import React from 'react'
 class SelectionItem extends React.Component {
   render = () => {
     return(
-      <div ref="container" >
+      <span ref="container" >
         { this.props.children }
-      </div>
+      </span>
     );
   }
 }

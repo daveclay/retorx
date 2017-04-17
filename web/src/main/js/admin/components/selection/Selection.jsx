@@ -6,7 +6,8 @@ class Selection extends React.Component {
 
   static propTypes = {
     enabled: React.PropTypes.bool,
-    onSelectionChange: React.PropTypes.func
+    onSelectionChange: React.PropTypes.func,
+    onDoubleClickSelection: React.PropTypes.func
   }
 
   /**
@@ -14,7 +15,8 @@ class Selection extends React.Component {
    */
   static defaultProps = {
     enabled: true,
-    onSelectionChange: () => {}
+    onSelectionChange: () => {},
+    onDoubleClickSelection: () => {}
   }
 
   /**
@@ -93,16 +95,18 @@ class Selection extends React.Component {
     this._fireSelectionChange()
   }
 
-  _fireSelectionChange = () => {
+  _collectValues = () => {
     let childrenArray = React.Children.toArray(this.props.children);
-    let values = keys(this.selectedChildren).map(key => {
+    return keys(this.selectedChildren).map(key => {
       let child = childrenArray.find(child => {
         return child.props.id == key;
       })
       return child.props.value;
     })
+  }
 
-    this.props.onSelectionChange(values);
+  _fireSelectionChange = () => {
+    this.props.onSelectionChange(this._collectValues());
   }
 
   /**
@@ -145,23 +149,43 @@ class Selection extends React.Component {
       let id = child.props.id ? child.props.id : index++;
       let isSelected = this.selectedChildren[id] != null;
 
+      let handleDoubleClick = (e) => {
+        this.clickTimeout = null;
+        if (!this.selectedChildren[id]) {
+          this.selectedChildren = {};
+          this.selectItem(id, true)
+        }
+        let collectValues = this._collectValues();
+        this.props.onDoubleClickSelection(collectValues);
+      }
+
       let handleSelect = (e) => {
         if (this.props.enabled) {
+          e.persist()
           e.preventDefault();
           e.stopPropagation();
-          if (!e.ctrlKey && !e.altKey && !e.shiftKey) {
-            this.selectedChildren = {};
+
+          if (!this.clickTimeout) {
+            this.clickTimeout = setTimeout(() => {
+              if (this.clickTimeout) {
+                this.clickTimeout = null;
+                if (!e.ctrlKey && !e.altKey && !e.shiftKey) {
+                  this.selectedChildren = {};
+                }
+                this.selectItem(id, this.selectedChildren[id] == null);
+              }
+            }, 300)
           }
-          this.selectItem(id, this.selectedChildren[id] == null);
         }
       }
 
       return (
-        <span className={'select-box ' + (isSelected ? 'selected' : '')}
+        <div className={'select-box ' + (isSelected ? 'selected' : '')}
               ref={id}
+              onDoubleClick={handleDoubleClick}
               onClickCapture={handleSelect} >
           { child }
-        </span>
+        </div>
       )
     });
   }
@@ -186,8 +210,7 @@ class Selection extends React.Component {
   selectItem = (key, select) => {
     if(select) {
       this.selectedChildren[key] = select;
-    }
-    else {
+    } else {
       delete this.selectedChildren[key];
     }
     this._fireSelectionChange()
@@ -256,8 +279,8 @@ class Selection extends React.Component {
       return null;
     }
     let parentNode = this.refs.selectionBox
-    let left = Math.min(startPoint.x, endPoint.x) - parentNode.offsetLeft;
-    let top = Math.min(startPoint.y, endPoint.y) - parentNode.offsetTop;
+    let left = Math.min(startPoint.x, endPoint.x) - parentNode.clientLeft;
+    let top = Math.min(startPoint.y, endPoint.y) - parentNode.clientTop;
     let width = Math.abs(startPoint.x - endPoint.x);
     let height = Math.abs(startPoint.y - endPoint.y);
     return {

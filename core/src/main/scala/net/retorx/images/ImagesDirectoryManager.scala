@@ -8,6 +8,8 @@ import com.google.inject.{Inject, Singleton}
 import org.apache.commons.io.FileUtils
 import net.retorx.{ImageContent, ImageFile}
 
+import scala.collection.parallel.ForkJoinTaskSupport
+
 @Singleton
 class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 									   managerType: ManagerType) {
@@ -23,7 +25,9 @@ class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 		}
 
 		val files = imagesDir.listFiles()
-		val total = files.size
+		val parFilesList = files.par
+		// Let's not run out of file handles, eh?
+		parFilesList.tasksupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(4))
 		files.par.foreach { file  =>
 			try {
 				managerType.buildImageContent(file) match {
@@ -48,7 +52,7 @@ class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 		file.delete()
 	}
 
-	def renameTag(existingTag: String, newTag: String) = {
+	def renameTag(existingTag: String, newTag: String) {
 		val tags = getDefaultTags
 		val save = (updatedTags: Array[String]) => {
 			getTagFile match {

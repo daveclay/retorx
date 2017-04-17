@@ -3,6 +3,21 @@ import { Tabs, Tab } from "react-bootstrap"
 
 import Menu from "../containers/Menu"
 import Tag from "../containers/Tag"
+import MultipleImageEditor from "../containers/MultipleImageEditor"
+import SingleImageEditor from "../containers/SingleImageEditor"
+
+const Loader = ({
+  loader
+}) => {
+  return (
+    <div id="loader-overlay" className={`${ loader.get("show") ? " loader-overlay-show" : ""}`}>
+      <div className="message">
+        {loader.get("message")}
+      </div>
+      <div className="loader"/>
+    </div>
+  )
+}
 
 const buildTabForTags = (tags) => {
   return tags.map(tag => {
@@ -20,9 +35,11 @@ const buildTabForTags = (tags) => {
 const App = ({
   tags,
   activeTag,
-  onTagSelected
+  onTagSelected,
+  loader
 }) => (
   <div>
+    <Loader loader={loader} />
     <Menu />
     <Tabs
       id="tags"
@@ -30,6 +47,8 @@ const App = ({
       onSelect={ (tag) => onTagSelected(tag) }>
       { buildTabForTags(tags) }
     </Tabs>
+    <MultipleImageEditor />
+    <SingleImageEditor />
   </div>
 )
 

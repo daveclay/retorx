@@ -10,6 +10,7 @@ import scala.collection.immutable.{SortedSet, TreeSet}
 @Singleton
 class ImageContentLibrary @Inject()(imagesDirectoryManager: ImagesDirectoryManager) {
 
+	var imageContentById = Map[String, ImageContent]()
 	var imageContentByName = Map[String, ImageContent]()
 	var imageContentByTag = Map[String, SortedSet[ImageContent]]()
 	var imageContents = TreeSet[ImageContent]()
@@ -32,7 +33,7 @@ class ImageContentLibrary @Inject()(imagesDirectoryManager: ImagesDirectoryManag
 	 * Rebuild the entire ImageData set of images without the specified file. Then again, maybe just mark these
 	 * as fucking hidden and avoid the whole confusion.
 	 */
-	def buildWithoutImageFile(imageContent: ImageContent, imageFile: ImageFile) = {
+	def buildWithoutImageFile(imageContent: ImageContent, imageFile: ImageFile): ImageContentLibrary = {
 		imagesDirectoryManager.deleteImageFile(imageFile)
 		// Todo: remove properties? Do we know which ones? Assume? What fucking properties are you talking about?
 		// imageContent.setImageFiles(imageContent.getImageFiles.filterNot(anImageFile => anImageFile.name.equals(imageContent.name)))
@@ -49,7 +50,7 @@ class ImageContentLibrary @Inject()(imagesDirectoryManager: ImagesDirectoryManag
 		tags = imagesDirectoryManager.getDefaultTags.foldLeft(List[String]())((tags, tag) => tags :+ tag.trim())
 	}
 
-	def addImageContent(imageContent: ImageContent) = {
+	def addImageContent(imageContent: ImageContent) {
 		synchronized {
 			imageContentByName = imageContentByName + (imageContent.getName -> imageContent)
 			handleImageContentTags(imageContent)
@@ -73,7 +74,7 @@ class ImageContentLibrary @Inject()(imagesDirectoryManager: ImagesDirectoryManag
 		imageContentByTag = imageContentByTag + (tag -> imageContentsForTag)
 	}
 
-	def renameTag(existingTag: String, newTag: String) = {
+	def renameTag(existingTag: String, newTag: String) {
 		// Todo: looping around and modifying to inconsistent state.
 		imageContentByTag.get(existingTag) match {
 			case Some(imageContentsForTag) =>
@@ -124,13 +125,13 @@ class ImageContentDAO @Inject()(var imageContentLibrary: ImageContentLibrary) {
 		imageContentLibrary.reprocessImagesFromOriginal(imageContent)
 	}
 
-	def addImageContent(imageContent: ImageContent) = {
+	def addImageContent(imageContent: ImageContent) {
 		withImageContentLibrary { imageContentLibrary =>
 			imageContentLibrary.addImageContent(imageContent)
 		}
 	}
 
-	def deleteImageFileForImage(imageContent: ImageContent, imageFile: ImageFile) = {
+	def deleteImageFileForImage(imageContent: ImageContent, imageFile: ImageFile) {
 		setImageContentLibrary(imageContentLibrary.buildWithoutImageFile(imageContent, imageFile))
 	}
 
@@ -181,9 +182,9 @@ class ImageContentDAO @Inject()(var imageContentLibrary: ImageContentLibrary) {
 		}
 	}
 
-	def getImageContent(id: String) = {
+	def getImageContent(name: String) = {
 		withImageContentLibrary { imageContentLibrary =>
-			imageContentLibrary.imageContentByName(id)
+			imageContentLibrary.imageContentByName(name)
 		}
 	}
 

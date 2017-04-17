@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context>
+<Context
+        antiResourceLocking="false"
+        cachingAllowed="false" >
     <Parameter
             name="content.dir"
             value="/Users/daveclay/work/retorx/content"/>

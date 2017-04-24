@@ -1,5 +1,11 @@
 import React from 'react'
-import { Navbar, Nav, NavItem } from 'react-bootstrap'
+import {
+  Navbar,
+  Nav,
+  NavItem,
+  Button,
+  Col
+} from 'react-bootstrap'
 
 const buildNavItems = (
   menuItems,
@@ -7,7 +13,10 @@ const buildNavItems = (
 ) => {
   return menuItems.map(item => {
     return (
-      <NavItem key={item.get("name")} onSelect={() => onSelect(item)}>{item.get("name")}</NavItem>
+      <Button key={item.get("name")}
+               onClick={() => onSelect(item)}>
+        {item.get("name")}
+      </Button>
     )
   })
 }
@@ -18,15 +27,13 @@ const Menu = ({
 }) => {
 
   return (
-    <Navbar>
-      <Navbar.Header>
-        <Navbar.Brand>
-          <a href="#">Admin</a>
-        </Navbar.Brand>
-      </Navbar.Header>
-      <Nav>
+    <Navbar fixedTop>
+      <Col xs={2} md={2}>
+        Admin
+      </Col>
+      <Col xs={10} md={10} mdHidden>
         { buildNavItems(menuItems, onSelect) }
-      </Nav>
+      </Col>
     </Navbar>
   )
 }

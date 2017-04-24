@@ -3,12 +3,12 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    main: ['babel-polyfill', './src/main/js/app.jsx' ],
+    main: ['babel-polyfill', './src/main/js/main/app.jsx' ],
     admin: ['babel-polyfill', './src/main/js/admin/app.jsx' ],
   },
   output: {
-    path: "./src/main/webapp/js",
-    filename: "[name].bundle.js",
+    path: "./src/main/webapp",
+    filename: "js/[name].bundle.js",
     chunkFilename: "[id].chunk.js"
   },
   resolve: {
@@ -29,7 +29,15 @@ module.exports = {
       {
         test: /\.json$/,
         loader: "json-loader"
-      }
+      },
+      {
+        test: /\.css$/,
+        loader: "style-loader!css-loader"
+      },
+      {
+        test: /\.(gif|jpg|png|svg)$/,
+        loader: 'file-loader?name=images/[name].[ext]'
+      },
     ]
   }
 };

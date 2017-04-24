@@ -1,6 +1,6 @@
 import Immutable from "immutable"
 
-import { jsonApiFor } from "../lib/api"
+import { jsonApiFor } from "../../lib/api"
 import { baseServicesPath } from "../../main/constants/constants"
 import {
   imageLoaded

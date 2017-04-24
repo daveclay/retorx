@@ -1,16 +1,20 @@
 import React from 'react'
 
-import "../../css/adminStyles.css"
+import 'react-photoswipe/lib/photoswipe.css';
+import "../../css/styles.css"
 
 import thunkMiddleware from 'redux-thunk'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware, compose } from 'redux'
-import { initialize } from "./actions/actions"
-import { loadAllTags } from "../main/actions/imageApiActions"
+import {
+  loadImagesForTag,
+  loadAllTags
+} from "../main/actions/imageApiActions"
 import reducers from './reducers/reducers'
 import App from './containers/App'
 import InitialState from './InitialState'
+
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -21,7 +25,7 @@ const store = createStore(
     applyMiddleware(thunkMiddleware),
   )
 )
-store.dispatch(initialize())
+store.dispatch(loadImagesForTag(InitialState.get("initialTag")))
 store.dispatch(loadAllTags())
 
 if (typeof document !== 'undefined') {
@@ -34,3 +38,4 @@ if (typeof document !== 'undefined') {
 } else {
   console.log("No document")
 }
+

@@ -1,6 +1,6 @@
 import Immutable from "immutable"
 
-import { chainReducers, map } from './utils/chainReducers'
+import { chainReducers, map } from '../../lib/chainReducers'
 import {
   upserter,
   findById

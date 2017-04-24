@@ -1,10 +1,16 @@
 import { fromJS } from 'immutable'
 
-import { jsonApiFor } from "../../admin/lib/api"
-import { transformImage, transformImages } from "../../admin/lib/imageData"
+import { jsonApiFor } from "../../lib/api"
+import { transformImage, transformImages } from "../../lib/imageData"
 import { baseImageContentServicePath } from "../constants/constants"
 
 const imageApi = jsonApiFor(baseImageContentServicePath)
+
+export const initialize = (initialTag) => {
+  return dispatch => {
+    loadImagesForTag(initialTag)
+  }
+}
 
 export const loadAllTags = () => {
   return dispatch => {
@@ -23,14 +29,6 @@ export const loadImagesForTag = (tag) => {
       }).then(images => {
         dispatch(imagesLoaded(tag, images))
       })
-  }
-};
-
-export const loadLatestImages = () => {
-  return dispatch => {
-    imageApi.get("latest").then(images => {
-      dispatch(imagesLoaded(images))
-    })
   }
 };
 

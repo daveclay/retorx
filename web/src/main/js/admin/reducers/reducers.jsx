@@ -20,6 +20,18 @@ const showLoader = (state, action) => {
   }))
 }
 
+const openImageUploader = (state, action) => {
+  return state.set("openImageUploader", true)
+}
+
+const closeImageUploader = (state, action) => {
+  return state.set("openImageUploader", false)
+}
+
+const imageSelected = (state, action) => {
+  return state.set("selectedImageFiles", action.files)
+}
+
 const editSelected = (state, action) => {
   console.log(action)
   let selectedImages = state.get("selectedImages");
@@ -126,5 +138,8 @@ export default chainReducers(
   map("DELETE_IMAGE_PROPERTY").to(deleteImageProperty),
   map("SHOW_LOADER").to(showLoader),
   map("TAGS_RELOADED").to(tagsReloaded),
+  map("OPEN_IMAGE_UPLOADER").to(openImageUploader),
+  map("CLOSE_IMAGE_UPLOADER").to(closeImageUploader),
+  map("IMAGE_SELECTED").to(imageSelected),
 )
 

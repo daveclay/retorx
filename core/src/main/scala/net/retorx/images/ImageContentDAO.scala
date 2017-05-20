@@ -184,7 +184,7 @@ class ImageContentDAO @Inject()(var imageContentLibrary: ImageContentLibrary) {
 
 	def getImageContent(name: String) = {
 		withImageContentLibrary { imageContentLibrary =>
-			imageContentLibrary.imageContentByName(name)
+			imageContentLibrary.imageContentByName.get(name)
 		}
 	}
 

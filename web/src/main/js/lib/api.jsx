@@ -3,7 +3,7 @@
 const location = window.location
 const host = `${location.protocol}//${location.hostname}${(location.port ? ':'+location.port: '')}/`
 
-const API = (baseUrl) => {
+export const jsonApiFor = (baseUrl) => {
   return {
     get: (url) => {
       return fetch(host + baseUrl + url, {
@@ -28,28 +28,33 @@ const API = (baseUrl) => {
         })
     },
 
-    postFile: (params) => {
-    },
-  }
-}
-
-export const jsonApiFor = (baseUrl) => {
-  let api = API(baseUrl)
-  return {
-    get: (url) => {
-      return api.get(url)
-        .then((response) => {
-          return response
+    put: (params) => {
+      return fetch(host + baseUrl + params.url, {
+        method: 'PUT',
+        body: params.data,
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'same-origin'
+      })
+        .then(res => res.json())
+        .catch(err => {
+          console.error(err);
         })
     },
 
-    post: (params) => {
-      return api.post(params)
-        .then((response) => {
-          return response
-        })
-    },
     postFile: (params) => {
+      let formData = new FormData()
+      formData.append("image", params.file)
+      return fetch(host + baseUrl + params.url, {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+      })
+        .then(res => res.json())
+        .then(json => resolve(json))
+        .catch(err => {
+          console.error(err);
+          reject(err)
+        })
     },
   }
 }

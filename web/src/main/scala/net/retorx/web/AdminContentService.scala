@@ -14,8 +14,8 @@ import org.jboss.resteasy.annotations.cache.NoCache
 
 @Path("/admin")
 @Singleton
-class AdminContentService @Inject()(imageContentDAO: ImageContentDAO,
-									siteContentService: SiteContentService) {
+class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
+									siteContentService: SiteContentService) extends ContentService {
 
 	val multipartHandler = new MultipartHandler()
 
@@ -51,46 +51,63 @@ class AdminContentService @Inject()(imageContentDAO: ImageContentDAO,
 	@Consumes(Array("text/json", "application/json", "application/vnd.imageContent+json"))
 	@Produces(Array("application/vnd.imageContent+json"))
 	def saveProperties(@PathParam("name") name: String, properties: java.util.Map[String, String]) = {
-		val imageContent = imageContentDAO.getImageContent(name)
-		val wrapped = scala.collection.JavaConversions.mapAsScalaMap(properties)
-		imageContent.setProperties(wrapped.toMap)
-		imageContent.savePropertiesFile()
-		// a little overzealous, but whatever - how long does it take to determine whether tags have changed vs
-		// just reloading the damned tags?
-		imageContentDAO.reloadTags()
-		imageContent
+		withImageContent(name) { imageContent =>
+			val wrapped = scala.collection.JavaConversions.mapAsScalaMap(properties)
+			imageContent.setProperties(wrapped.toMap)
+			imageContent.savePropertiesFile()
+			// a little overzealous, but whatever - how long does it take to determine whether tags have changed vs
+			// just reloading the damned tags?
+			imageContentDAO.reloadTags()
+			imageContent
+		}
 	}
 
 	@DELETE
 	@Path("/image/{name}.png")
 	def deleteImageFile(@PathParam("name") name: String) = {
-		val imageContent = imageContentDAO.getImageContent(name)
-		imageContent.getImageFileByVersion(name) match {
-			case Some(imageFile) =>
-				imageContentDAO.deleteImageFileForImage(imageContent, imageFile)
-				successJson
-			case None =>
-				throw new NotFoundException("image file " + name + " does not exist")
+		withImageContent(name) { imageContent =>
+			imageContent.getImageFileByVersion(name) match {
+				case Some(imageFile) =>
+					imageContentDAO.deleteImageFileForImage(imageContent, imageFile)
+					successJson
+				case None =>
+					throw new NotFoundException("image file " + name + " does not exist")
+			}
 		}
 	}
 
 	@PUT
 	@Path("/image/{name}.png")
+	@Consumes(Array("image/png"))
 	def replaceImageFile(@PathParam("name") name: String,
 						 input: MultipartFormDataInput) = {
-		val imageContent = imageContentDAO.getImageContent(name)
-		imageContent.getImageFileByVersion(name) match {
-			case Some(imageFile) =>
-				multipartHandler.handleMultipartData(input, (filename, inputStream) => {
-					val file = imageFile.file
-					val originalModifiedDate = file.lastModified()
-					IOUtils.copy(inputStream, new FileOutputStream(file))
-					// TODO: re-create thumbnails and size properties. But, meh, who cares.
-					imageContentDAO.replaceOriginalImage(imageContent)
-					file.setLastModified(originalModifiedDate)
-				})
+		withImageContent(name) { imageContent =>
+			imageContent.getImageFileByVersion(name) match {
+				case Some(imageFile) =>
+					multipartHandler.handleMultipartData(input, (filename, inputStream) => {
+						val file = imageFile.file
+						val originalModifiedDate = file.lastModified()
+						IOUtils.copy(inputStream, new FileOutputStream(file))
+						// TODO: re-create thumbnails and size properties. But, meh, who cares.
+						imageContentDAO.replaceOriginalImage(imageContent)
+						file.setLastModified(originalModifiedDate)
+					})
+				case None =>
+					throw new NotFoundException("image file " + name + " does not exist")
+			}
+		}
+	}
+
+	@POST
+	@Path("/image/{name}")
+	def addImageFile(@PathParam("name") name: String,
+					 input: MultipartFormDataInput) = {
+		imageContentDAO.getImageContent(name) match {
+			case Some(imageContent) => throw new IllegalStateException("image file " + name + " already exists")
 			case None =>
-				throw new NotFoundException("image file " + name + " does not exist")
+				multipartHandler.handleMultipartData(input, (filenameOption, inputStream) => {
+					IOUtils.copy(inputStream, new FileOutputStream(new File("/tmp/" + filenameOption.getOrElse("file"))))
+				})
 		}
 	}
 

@@ -36,6 +36,7 @@
     "react-dom": "^15.5.4",
     "react-photoswipe": "^1.2.0",
     "react-redux": "^5.0.4",
+    "react-upload-file": "^2.0.0-beta.6",
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0",
     "velocity-animate": "^1.2.3"

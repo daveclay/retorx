@@ -9,20 +9,15 @@ class MultipartHandler {
 
     def handleMultipartData(input: MultipartFormDataInput,
                             f: (Option[String], InputStream) => Unit) {
-        handleMultipartData("file", input, f)
-    }
-
-    def handleMultipartData(fileInputField: String,
-                            input: MultipartFormDataInput,
-                           f: (Option[String], InputStream) => Unit) {
-        val uploadForm = input.getFormDataMap
-        val inputParts = uploadForm.get(fileInputField).asScala
-        inputParts.foreach(inputPart => {
-            val headers = inputPart.getHeaders
-            val filename = findFileName(headers)
-            val inputStream = inputPart.getBody(classOf[InputStream], null)
-            f(filename, inputStream)
-        })
+		val formDataMap = input.getFormDataMap.asScala
+		for ((name, inputParts) <- formDataMap) {
+			inputParts.asScala.foreach(inputPart => {
+				val headers = inputPart.getHeaders
+				val filename = findFileName(headers)
+				val inputStream = inputPart.getBody(classOf[InputStream], null)
+				f(filename, inputStream)
+			})
+		}
     }
 
     /**

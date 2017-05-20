@@ -19,6 +19,43 @@ export const tagSelected = (tagName) => {
   }
 }
 
+export const openImageUploader = () => {
+  return {
+    type: "OPEN_IMAGE_UPLOADER",
+  }
+}
+
+export const closeImageUploader = () => {
+  return {
+    type: "CLOSE_IMAGE_UPLOADER"
+  }
+}
+
+export const imageSelected = (files) => {
+  return {
+    type: "IMAGE_SELECTED",
+    files
+  }
+}
+
+export const addImage = (files) => {
+  return dispatch => {
+    let file = files[0]
+    let name =
+      file.name.indexOf(".") > -1 ?
+        file.name.substring(0, file.name.lastIndexOf('.')) :
+        file.name;
+    adminApi.postFile({
+      url: `/image/${name}`,
+      file: file,
+      contentType: file.type
+    })
+      .then((result) => {
+        console.log(result)
+      })
+  }
+}
+
 export const initialize = () => {
   return {
     type: "INITIALIZE"

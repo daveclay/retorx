@@ -3,7 +3,8 @@ import { fromJS } from 'immutable'
 import {
   reloadTags,
   reloadFiles,
-  editSelected
+  editSelected,
+  openImageUploader
 } from "./actions/actions"
 
 export default fromJS({
@@ -17,6 +18,10 @@ export default fromJS({
     {
       name: "reload files",
       action: reloadFiles
+    },
+    {
+      name: "Add",
+      action: openImageUploader
     },
     {
       name: "Edit",

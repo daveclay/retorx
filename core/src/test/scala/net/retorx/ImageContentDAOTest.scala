@@ -44,9 +44,6 @@ class ImageContentDAOTest extends Specification with Mockito {
 			val newImage1 = newImageContent("image1", Map("tags" -> "abstract"))
 
 			imageContentDao.reloadTags()
-			imageContentDao.addImageContent(newImage1)
-			imageContentDao.addImageContent(image2)
-			imageContentDao.addImageContent(image3)
 
 			val figureImages = imageContentDao.getImageContentByTag("figure")
 
@@ -61,11 +58,6 @@ class ImageContentDAOTest extends Specification with Mockito {
         when(imagesDirectoryManager.getDefaultTags).thenReturn(Array[String]())
 
         val imageContentDao = new ImageContentDAO(imageData)
-
-        imageContentDao.addImageContent(image1)
-        imageContentDao.addImageContent(image2)
-        imageContentDao.addImageContent(image3)
-
     }
 
     def newImageContent(name: String, properties: Map[String, String]) = {

@@ -3,7 +3,7 @@ package net.retorx.web
 import javax.ws.rs._
 
 import com.google.inject.{Inject, Singleton}
-import net.retorx.images.ImageContentDAO
+import net.retorx.images.{ImageContentDAO, ImagesDirectoryManager}
 import net.retorx.config.SiteContentService
 import org.jboss.resteasy.spi.NotFoundException
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput
@@ -15,6 +15,7 @@ import org.jboss.resteasy.annotations.cache.NoCache
 @Path("/admin")
 @Singleton
 class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
+									imagesDirectoryManager: ImagesDirectoryManager,
 									siteContentService: SiteContentService) extends ContentService {
 
 	val multipartHandler = new MultipartHandler()
@@ -106,7 +107,9 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 			case Some(imageContent) => throw new IllegalStateException("image file " + name + " already exists")
 			case None =>
 				multipartHandler.handleMultipartData(input, (filenameOption, inputStream) => {
-					IOUtils.copy(inputStream, new FileOutputStream(new File("/tmp/" + filenameOption.getOrElse("file"))))
+					val properties = Map("name" -> "test")
+					imagesDirectoryManager.addImage(name, properties, inputStream)
+					imageContentDAO.reloadFromFiles()
 				})
 		}
 	}

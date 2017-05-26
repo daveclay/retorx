@@ -23,7 +23,7 @@ const showLoader = (state, action) => {
 const openAddImage = (state, action) => {
   let imageProperties = Immutable.Map({
     date: new Date().toLocaleDateString(),
-    tags: state.get("selectedTag") || "",
+    tags: state.get("currentTag") || "",
     name: "Untitled",
   })
   return setImageEditorProperties(state.set("openSingleImageEditor", true), imageProperties)
@@ -82,7 +82,7 @@ const deleteImageProperty = (state, action) => {
 
 const tagSelected = (state, action) => {
   let imagesByTag = state.get("imagesByTag")
-  return state.set("selectedTag", action.tag)
+  return state.set("currentTag", action.tag)
 }
 
 const tagsLoaded = (state, action) => {

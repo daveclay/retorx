@@ -1,5 +1,4 @@
 import React from 'react'
-import { Tabs, Tab } from "react-bootstrap"
 
 import Menu from "../containers/Menu"
 import Tag from "../containers/Tag"
@@ -19,34 +18,20 @@ const Loader = ({
   )
 }
 
-const buildTabForTags = (tags) => {
-  return tags.map(tag => {
-    return (
-      <Tab key={tag}
-           mountOnEnter={true}
-           eventKey={tag}
-           title={tag}>
-        <Tag tag={tag} />
-      </Tab>
-    )
-  })
-}
-
 const App = ({
   tags,
-  activeTag,
+  currentTag,
   onTagSelected,
   loader
 }) => (
   <div>
     <Loader loader={loader} />
     <Menu />
-    <Tabs
-      id="tags"
-      activeKey={activeTag}
-      onSelect={ (tag) => onTagSelected(tag) }>
-      { buildTabForTags(tags) }
-    </Tabs>
+    {
+      currentTag ?
+        <Tag tag={currentTag} /> :
+        "Loading..."
+    }
     <MultipleImageEditor />
     <SingleImageEditor />
   </div>

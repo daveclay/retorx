@@ -5,7 +5,9 @@ import Selection from "./selection/Selection"
 import SelectionItem from "./selection/SelectionItem"
 import Thumbnail from "./Thumbnail"
 
-const renderImages = (images) => {
+class Tag extends React.Component {
+
+  renderImages = (images) => {
   if (images) {
     return images.map(image => {
       return (
@@ -17,18 +19,12 @@ const renderImages = (images) => {
       )
     })
   } else {
+    this.props.onLoad(this.props.tag)
     return (
       <div>loading...</div>
     )
   }
 }
-
-class Tag extends React.Component {
-  componentDidMount = () => {
-    if (!this.props.images) {
-      this.props.onLoad(this.props.tag)
-    }
-  }
 
   render = () => {
     return (
@@ -37,7 +33,7 @@ class Tag extends React.Component {
           <Selection onSelectionChange={this.props.onImagesSelected}
                      onDoubleClickSelection={this.props.onDoubleClickImages}>
             {
-              renderImages(this.props.images)
+              this.renderImages(this.props.images)
             }
           </Selection>
         </Col>

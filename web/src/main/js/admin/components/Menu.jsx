@@ -3,6 +3,8 @@ import {
   Navbar,
   Nav,
   NavItem,
+  NavDropdown,
+  MenuItem,
   Button,
   Col
 } from 'react-bootstrap'
@@ -13,27 +15,43 @@ const buildNavItems = (
 ) => {
   return menuItems.map(item => {
     return (
-      <Button key={item.get("name")}
+      <NavItem key={item.get("name")}
                onClick={() => onSelect(item)}>
         {item.get("name")}
-      </Button>
+      </NavItem>
     )
   })
 }
 
 const Menu = ({
+  tags,
+  currentTag,
   menuItems,
+  tagSelected,
   onSelect
 }) => {
 
   return (
-    <Navbar fixedTop>
-      <Col xs={2} md={2}>
-        Admin
-      </Col>
-      <Col xs={10} md={10} mdHidden>
-        { buildNavItems(menuItems, onSelect) }
-      </Col>
+    <Navbar fixedTop collapseOnSelect>
+      <Navbar.Header>
+        <Navbar.Brand>
+          Admin {currentTag}
+        </Navbar.Brand>
+        <Navbar.Toggle/>
+      </Navbar.Header>
+      <Navbar.Collapse>
+        <Nav pullRight>
+          { buildNavItems(menuItems, onSelect) }
+          {
+            tags.map(tag =>
+              <NavItem key={tag}
+                   onClick={() => tagSelected(tag)}>
+                {tag}
+              </NavItem>
+            )
+          }
+        </Nav>
+      </Navbar.Collapse>
     </Navbar>
   )
 }

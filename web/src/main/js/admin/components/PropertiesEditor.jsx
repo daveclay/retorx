@@ -33,14 +33,14 @@ class PropertyEditor extends React.Component {
     return (
       <FormGroup>
         <Col componentClass={ControlLabel}
-             sm={4}>
+             xs={4}>
           <FormControl type="text"
                        placeholder="Name"
                        value={name}
                        onChange={(e) => onChangeName(id, e.target.value)}
           />
         </Col>
-        <Col sm={5}>
+        <Col xs={5}>
           {
             value && value.length > 30 ?
               <FormControl componentClass="textarea"
@@ -56,7 +56,7 @@ class PropertyEditor extends React.Component {
                            onChange={(e) => onChangeValue(id, e.target.value) } />
           }
         </Col>
-        <Col sm={3}>
+        <Col xs={3}>
           <Button onClick={() => onDelete(id)}
                   bsStyle="danger">Delete</Button>
         </Col>

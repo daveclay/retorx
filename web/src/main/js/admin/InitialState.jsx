@@ -1,33 +1,11 @@
 import { fromJS } from 'immutable'
 
-import {
-  reloadTags,
-  reloadFiles,
-  editSelected,
-  openImageUploader
-} from "./actions/actions"
+import { menuItems } from "./lib/menuItems"
 
 export default fromJS({
   tags: [],
   imagesByTag: {},
-  menuItems: [
-    {
-      name: "reload tags",
-      action: reloadTags
-    },
-    {
-      name: "reload files",
-      action: reloadFiles
-    },
-    {
-      name: "Add",
-      action: openImageUploader
-    },
-    {
-      name: "Edit",
-      action: editSelected
-    },
-  ],
+  menuItems: menuItems,
   imageEditorProperties: [],
   multipleImageEditorProperties: [],
   loader: {

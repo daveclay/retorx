@@ -14,7 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.jboss.resteasy.annotations.cache.NoCache
-import org.jboss.resteasy.annotations.providers.multipart.PartType
+
+import scala.concurrent.Promise
 
 @Path("/admin")
 @Singleton
@@ -87,33 +88,26 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 	def replaceImageFile(@PathParam("name") name: String,
 						 formDataInput: MultipartFormDataInput) = {
 		withImageContent(name) { imageContent =>
-			imageContent.getImageFileByVersion("original") match {
-				case Some(imageFile) =>
-
-					import scala.collection.JavaConverters._
-					val formDataMap = formDataInput.getFormDataMap.asScala
-					val propertiesInputPart = formDataMap("properties").get(0)
-
-					val mapper = new ObjectMapper() with ScalaObjectMapper
-					mapper.registerModule(DefaultScalaModule)
-					val properties = mapper.readValue(propertiesInputPart.getBodyAsString, classOf[Map[String, String]])
-					imageContent.setProperties(properties)
-					imageContent.savePropertiesFile()
-
-					formDataMap.get("image") match {
-						case Some(imageInputParts) =>
-							val imageInputPart = imageInputParts.get(0)
-							val inputStream = imageInputPart.getBody(classOf[InputStream], null)
-							IOUtils.copy(inputStream, new FileOutputStream(imageFile.file))
-							imageContentDAO.replaceOriginalImage(imageContent)
-						case None =>
-					}
-					imageContentDAO.reloadFromFiles()
-					successJson
-				case None =>
-					throw new NotFoundException("Somehow don't have an original file.")
-
+			val onPropertiesUploaded = (properties: Map[String, String]) => {
+				imageContent.setProperties(properties)
+				imageContent.savePropertiesFile()
 			}
+
+			val onFileUploaded = (inputStream: InputStream) => {
+				imageContent.getImageFileByVersion("original") match {
+					case Some(imageFile) =>
+						IOUtils.copy(inputStream, new FileOutputStream(imageFile.file))
+						imageContentDAO.replaceOriginalImage(imageContent)
+					case None =>
+						throw new NotFoundException("Somehow don't have an original file.")
+
+				}
+			}
+
+			handleProperties(formDataInput, onPropertiesUploaded)
+			handleFileUpload(formDataInput, onFileUploaded)
+			imageContentDAO.reloadFromFiles()
+			successJson
 		}
 	}
 
@@ -121,16 +115,60 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 	@Path("/image/{name}")
 	@Consumes(Array("multipart/form-data"))
 	def addImageFile(@PathParam("name") name: String,
-					 input: MultipartFormDataInput) = {
+					 formDataInput: MultipartFormDataInput) = {
 		imageContentDAO.getImageContent(name) match {
 			case Some(imageContent) => throw new IllegalStateException("image file " + name + " already exists")
 			case None =>
-				multipartHandler.handleMultipartData(input, (filenameOption, inputStream) => {
-					val properties = Map("name" -> "test")
+				val propertiesPromise = Promise[Map[String, String]]()
+				val filePromise = Promise[InputStream]()
+
+				val onPropertiesUploaded = (properties: Map[String, String]) => {
+					propertiesPromise.success(properties)
+				}
+
+				val onFileUploaded = (inputStream: InputStream) => {
+					filePromise.success(inputStream)
+				}
+
+				handleProperties(formDataInput, onPropertiesUploaded)
+				handleFileUpload(formDataInput, onFileUploaded)
+
+
+				for {
+					properties <- propertiesPromise.future.value.get
+					inputStream <- filePromise.future.value.get
+				} yield {
 					imagesDirectoryManager.addImage(name, properties, inputStream)
 					imageContentDAO.reloadFromFiles()
-				})
+				}
+
+				successJson
 		}
+	}
+
+	private def handleProperties[T](formDataInput: MultipartFormDataInput,
+									onPropertiesUploaded: (Map[String, String] => T)) = {
+		val propertiesInputPart = getFormDataMap(formDataInput)("properties").get(0)
+		val mapper = new ObjectMapper() with ScalaObjectMapper
+		mapper.registerModule(DefaultScalaModule)
+		val properties = mapper.readValue(propertiesInputPart.getBodyAsString, classOf[Map[String, String]])
+		onPropertiesUploaded(properties)
+	}
+
+	private def handleFileUpload[T](formDataInput: MultipartFormDataInput,
+									onFileUploaded: (InputStream) => T) = {
+		getFormDataMap(formDataInput).get("image") match {
+			case Some(imageInputParts) =>
+				val imageInputPart = imageInputParts.get(0)
+				val inputStream = imageInputPart.getBody(classOf[InputStream], null)
+				onFileUploaded(inputStream)
+			case None =>
+		}
+	}
+
+	private def getFormDataMap(formDataInput: MultipartFormDataInput) = {
+		import scala.collection.JavaConverters._
+		formDataInput.getFormDataMap.asScala
 	}
 
 	@GET

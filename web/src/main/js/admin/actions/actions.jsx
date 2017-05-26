@@ -12,16 +12,16 @@ import {
   addEditorPropertiesToFormData
 } from "../lib/properties"
 
-export const tagSelected = (tagName) => {
+export const tagSelected = (tag) => {
   return {
     type: "TAG_SELECTED",
-    tagName
+    tag
   }
 }
 
-export const openImageUploader = () => {
+export const openAddImage = () => {
   return {
-    type: "OPEN_IMAGE_UPLOADER",
+    type: "OPEN_ADD_IMAGE",
   }
 }
 
@@ -68,24 +68,34 @@ export const menuItemSelected = (menuItem) => {
 }
 
 export const saveImage = (image, editorProperties, files) => {
+  const withFile = (f) => {
+    if (files && files.length > 0) {
+      return f(files[0])
+    }
+  }
+
   return dispatch => {
-    dispatch(showLoader(true, `Saving ${image.get("name")}`))
+    let filename = withFile(file => {
+      return file.name.indexOf(".") > -1 ?
+        file.name.substring(0, file.name.lastIndexOf('.')) :
+        file.name;
+    })
+
+    let name = image ? image.get("name") : filename
+
+    dispatch(showLoader(true, `Saving ${name}`))
 
     let formData = new FormData();
-    if (files && files.length > 0) {
-      let file = files[0]
-      let name =
-        file.name.indexOf(".") > -1 ?
-          file.name.substring(0, file.name.lastIndexOf('.')) :
-          file.name;
+
+    withFile(file => {
       formData.append("image", file)
-    }
+    })
 
     addEditorPropertiesToFormData(editorProperties, formData)
 
     adminApi.send({
       method: image ? "PUT" : "POST",
-      url: "/image/" + image.get("name"),
+      url: `/image/${name}`,
       headers: {},
       data: formData
     }).then(savedPojoImage => {

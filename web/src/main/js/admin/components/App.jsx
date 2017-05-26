@@ -5,7 +5,6 @@ import Menu from "../containers/Menu"
 import Tag from "../containers/Tag"
 import MultipleImageEditor from "../containers/MultipleImageEditor"
 import SingleImageEditor from "../containers/SingleImageEditor"
-import ImageUploader from "../containers/ImageUploader"
 
 const Loader = ({
   loader
@@ -50,7 +49,6 @@ const App = ({
     </Tabs>
     <MultipleImageEditor />
     <SingleImageEditor />
-    <ImageUploader />
   </div>
 )
 

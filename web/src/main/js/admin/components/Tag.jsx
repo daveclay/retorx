@@ -31,7 +31,6 @@ class Tag extends React.Component {
   }
 
   render = () => {
-    let tag = this.props.tag
     return (
       <Row>
         <Col xs={12}>

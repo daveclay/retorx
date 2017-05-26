@@ -20,12 +20,13 @@ const showLoader = (state, action) => {
   }))
 }
 
-const openImageUploader = (state, action) => {
-  return state.set("openImageUploader", true)
-}
-
-const closeImageUploader = (state, action) => {
-  return state.set("openImageUploader", false)
+const openAddImage = (state, action) => {
+  let imageProperties = Immutable.Map({
+    date: new Date().toLocaleDateString(),
+    tags: state.get("selectedTag") || "",
+    name: "Untitled",
+  })
+  return setImageEditorProperties(state.set("openSingleImageEditor", true), imageProperties)
 }
 
 const imageFilesSelected = (state, action) => {
@@ -81,7 +82,7 @@ const deleteImageProperty = (state, action) => {
 
 const tagSelected = (state, action) => {
   let imagesByTag = state.get("imagesByTag")
-  return state.set("imagesByTag", imagesByTag.set(action.tag, Immutable.List()))
+  return state.set("selectedTag", action.tag)
 }
 
 const tagsLoaded = (state, action) => {
@@ -138,8 +139,7 @@ export default chainReducers(
   map("DELETE_IMAGE_PROPERTY").to(deleteImageProperty),
   map("SHOW_LOADER").to(showLoader),
   map("TAGS_RELOADED").to(tagsReloaded),
-  map("OPEN_IMAGE_UPLOADER").to(openImageUploader),
-  map("CLOSE_IMAGE_UPLOADER").to(closeImageUploader),
+  map("OPEN_ADD_IMAGE").to(openAddImage),
   map("IMAGE_FILES_SELECTED").to(imageFilesSelected),
 )
 

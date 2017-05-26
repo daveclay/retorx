@@ -16,7 +16,7 @@ import SingleImageEditor from "../components/SingleImageEditor"
 const mapStateToProps = (state) => {
   let showEditor = state.get("openSingleImageEditor")
   let selectedImages = state.get("selectedImages")
-  let image = showEditor ? selectedImages.get(0) : null
+  let image = (showEditor && selectedImages && selectedImages.get(0)) || null
   return {
     selectedImageFiles: state.get("selectedImageFiles"),
     showEditor: state.get("openSingleImageEditor"),

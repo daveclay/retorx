@@ -3,7 +3,7 @@ import Immutable from "immutable"
 import { chainReducers, map } from '../../lib/chainReducers'
 
 const tagsLoaded = (state, action) => {
-  return state.set("tags", action.tags)
+  return state.set("tags", action.tags.filterNot(tag => tag == 'uncategorized'))
 }
 
 const tagSelected = (state, action) => {

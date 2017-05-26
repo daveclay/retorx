@@ -57,11 +57,12 @@ export const buildEditorProperties = (imageProperties) => {
   })
 }
 
-export const buildPropertiesJson = (editorProperties) => {
-  let propertiesJson = {}
+export const addEditorPropertiesToFormData = (editorProperties, formData) => {
+  let properties = {}
   editorProperties.forEach(editorProperty => {
-    propertiesJson[editorProperty.get("name")] = editorProperty.get("value")
+    properties[editorProperty.get("name")] = editorProperty.get("value")
   })
-  return propertiesJson
+  let blob = new Blob([JSON.stringify(properties, null, 2)], { type : 'application/json' })
+  formData.append("properties", blob)
 }
 

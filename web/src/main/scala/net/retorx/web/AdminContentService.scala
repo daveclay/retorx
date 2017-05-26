@@ -6,11 +6,15 @@ import com.google.inject.{Inject, Singleton}
 import net.retorx.images.{ImageContentDAO, ImagesDirectoryManager}
 import net.retorx.config.SiteContentService
 import org.jboss.resteasy.spi.NotFoundException
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput
+import org.jboss.resteasy.plugins.providers.multipart.{InputPart, MultipartFormDataInput}
 import org.apache.commons.io.IOUtils
-import java.io.{File, FileOutputStream}
+import java.io.{File, FileOutputStream, InputStream}
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.jboss.resteasy.annotations.cache.NoCache
+import org.jboss.resteasy.annotations.providers.multipart.PartType
 
 @Path("/admin")
 @Singleton
@@ -48,7 +52,7 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 	}
 
 	@POST
-	@Path("{name}/properties")
+	@Path("/image/{name}/properties")
 	@Consumes(Array("text/json", "application/json", "application/vnd.imageContent+json"))
 	@Produces(Array("application/vnd.imageContent+json"))
 	def saveProperties(@PathParam("name") name: String, properties: java.util.Map[String, String]) = {
@@ -78,29 +82,44 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 	}
 
 	@PUT
-	@Path("/image/{name}.png")
-	@Consumes(Array("image/png"))
+	@Path("/image/{name}")
+	@Consumes(Array("multipart/form-data"))
 	def replaceImageFile(@PathParam("name") name: String,
-						 input: MultipartFormDataInput) = {
+						 formDataInput: MultipartFormDataInput) = {
 		withImageContent(name) { imageContent =>
-			imageContent.getImageFileByVersion(name) match {
+			imageContent.getImageFileByVersion("original") match {
 				case Some(imageFile) =>
-					multipartHandler.handleMultipartData(input, (filename, inputStream) => {
-						val file = imageFile.file
-						val originalModifiedDate = file.lastModified()
-						IOUtils.copy(inputStream, new FileOutputStream(file))
-						// TODO: re-create thumbnails and size properties. But, meh, who cares.
-						imageContentDAO.replaceOriginalImage(imageContent)
-						file.setLastModified(originalModifiedDate)
-					})
+
+					import scala.collection.JavaConverters._
+					val formDataMap = formDataInput.getFormDataMap.asScala
+					val propertiesInputPart = formDataMap("properties").get(0)
+
+					val mapper = new ObjectMapper() with ScalaObjectMapper
+					mapper.registerModule(DefaultScalaModule)
+					val properties = mapper.readValue(propertiesInputPart.getBodyAsString, classOf[Map[String, String]])
+					imageContent.setProperties(properties)
+					imageContent.savePropertiesFile()
+
+					formDataMap.get("image") match {
+						case Some(imageInputParts) =>
+							val imageInputPart = imageInputParts.get(0)
+							val inputStream = imageInputPart.getBody(classOf[InputStream], null)
+							IOUtils.copy(inputStream, new FileOutputStream(imageFile.file))
+							imageContentDAO.replaceOriginalImage(imageContent)
+						case None =>
+					}
+					imageContentDAO.reloadFromFiles()
+					successJson
 				case None =>
-					throw new NotFoundException("image file " + name + " does not exist")
+					throw new NotFoundException("Somehow don't have an original file.")
+
 			}
 		}
 	}
 
 	@POST
 	@Path("/image/{name}")
+	@Consumes(Array("multipart/form-data"))
 	def addImageFile(@PathParam("name") name: String,
 					 input: MultipartFormDataInput) = {
 		imageContentDAO.getImageContent(name) match {

@@ -9,7 +9,7 @@ import {
 const adminApi = jsonApiFor(baseServicesPath + "admin")
 import {
   buildEditorProperties,
-  buildPropertiesJson
+  addEditorPropertiesToFormData
 } from "../lib/properties"
 
 export const tagSelected = (tagName) => {
@@ -31,28 +31,15 @@ export const closeImageUploader = () => {
   }
 }
 
-export const imageSelected = (files) => {
+export const imageFilesSelected = (files) => {
   return {
-    type: "IMAGE_SELECTED",
+    type: "IMAGE_FILES_SELECTED",
     files
   }
 }
 
 export const addImage = (files) => {
   return dispatch => {
-    let file = files[0]
-    let name =
-      file.name.indexOf(".") > -1 ?
-        file.name.substring(0, file.name.lastIndexOf('.')) :
-        file.name;
-    adminApi.postFile({
-      url: `/image/${name}`,
-      file: file,
-      contentType: file.type
-    })
-      .then((result) => {
-        console.log(result)
-      })
   }
 }
 
@@ -80,12 +67,34 @@ export const menuItemSelected = (menuItem) => {
   }
 }
 
-export const uploadImage = () => {
+export const saveImage = (image, editorProperties, files) => {
   return dispatch => {
-    adminApi.post({
-      url: "/image",
-    }).then(() => {
-      console.log("uploaded")
+    dispatch(showLoader(true, `Saving ${image.get("name")}`))
+
+    let formData = new FormData();
+    if (files && files.length > 0) {
+      let file = files[0]
+      let name =
+        file.name.indexOf(".") > -1 ?
+          file.name.substring(0, file.name.lastIndexOf('.')) :
+          file.name;
+      formData.append("image", file)
+    }
+
+    addEditorPropertiesToFormData(editorProperties, formData)
+
+    adminApi.send({
+      method: image ? "PUT" : "POST",
+      url: "/image/" + image.get("name"),
+      headers: {},
+      data: formData
+    }).then(savedPojoImage => {
+      return Immutable.fromJS(savedPojoImage)
+    }).then(savedImage => {
+      console.log(`saved image ${savedImage.get("name")}`);
+      dispatch(closeSingleImageEditor())
+      dispatch(showLoader(false))
+      return savedImage
     })
   }
 }
@@ -107,19 +116,6 @@ export const reloadFiles = () => {
       console.log("reloaded!")
       dispatch(showLoader(false))
     })
-  }
-}
-
-export const renameTag = (existingTag, tagField) => {
-  return dispatch => {
-    dispatch(showLoader(true))
-    adminApi.post({
-      url: "/rename/" + existingTag,
-      data: tagField.val(),
-    })
-      .then(() => {
-        console.log("hi.")
-      })
   }
 }
 
@@ -153,18 +149,6 @@ export const saveSingleImageProperties = (image, editorProperties) => {
       dispatch(showLoader(false))
     })
   }
-}
-
-const saveProperties = (image, editorProperties) => {
-  return adminApi.post({
-      url: "/" + image.get("name") + "/properties",
-      data: JSON.stringify(buildPropertiesJson(editorProperties)),
-    }).then(updatedPojoImage => {
-      return Immutable.fromJS(updatedPojoImage)
-    }).then(updatedImage => {
-      console.log(`saved properties for ${updatedImage.get("name")}`);
-      return updatedImage
-    })
 }
 
 export const addImageProperty = () => {

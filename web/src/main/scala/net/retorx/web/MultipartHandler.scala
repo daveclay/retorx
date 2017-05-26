@@ -1,7 +1,8 @@
 package net.retorx.web
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput
+import org.jboss.resteasy.plugins.providers.multipart.{InputPart, MultipartFormDataInput}
 import javax.ws.rs.core.MultivaluedMap
+
 import scala.collection.JavaConverters._
 import java.io.InputStream
 

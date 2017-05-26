@@ -12,6 +12,8 @@ const SingleImageEditor = ({
   showEditor,
   properties,
   image,
+  selectedImageFiles,
+  onFileSelected,
   onAddProperty,
   onChangeName,
   onChangeValue,
@@ -19,6 +21,10 @@ const SingleImageEditor = ({
   onClose,
   onSave
 }) => {
+  let handleFileChange = (e) => {
+    onFileSelected(e.target.files)
+  }
+
   let name = image ? image.get("name") : ""
   return (
     <Modal show={showEditor} onHide={onClose} bsSize="lg">
@@ -35,10 +41,11 @@ const SingleImageEditor = ({
                                            onChangeValue={onChangeValue} />
             : <span/>
           }
+          <input type="file" onChange={handleFileChange} />
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => onSave(image, properties)}>Save</Button>
+        <Button onClick={() => onSave(image, properties, selectedImageFiles)}>Save</Button>
         <Button onClick={onClose}>Cancel</Button>
       </Modal.Footer>
     </Modal>

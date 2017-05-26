@@ -7,7 +7,8 @@ import {
   changeImagePropertyValue,
   addImageProperty,
   deleteImageProperty,
-  saveSingleImageProperties,
+  imageFilesSelected,
+  saveImage,
 } from "../actions/actions"
 
 import SingleImageEditor from "../components/SingleImageEditor"
@@ -17,6 +18,7 @@ const mapStateToProps = (state) => {
   let selectedImages = state.get("selectedImages")
   let image = showEditor ? selectedImages.get(0) : null
   return {
+    selectedImageFiles: state.get("selectedImageFiles"),
     showEditor: state.get("openSingleImageEditor"),
     properties: state.get("imageEditorProperties"),
     image: image
@@ -28,8 +30,8 @@ const mapDispatchToProps = (dispatch) => {
     onClose: function() {
       dispatch(closeSingleImageEditor())
     },
-    onSave: function(image, properties) {
-      dispatch(saveSingleImageProperties(image, properties))
+    onSave: function(image, properties, selectedImageFiles) {
+      dispatch(saveImage(image, properties, selectedImageFiles))
     },
     onChangeName: function(id, newName) {
       dispatch(changeImagePropertyName(id, newName))
@@ -42,7 +44,10 @@ const mapDispatchToProps = (dispatch) => {
     },
     onAddProperty: function() {
       dispatch(addImageProperty())
-    }
+    },
+    onFileSelected: function(files) {
+      dispatch(imageFilesSelected(files))
+    },
   }
 }
 

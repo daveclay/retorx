@@ -28,7 +28,7 @@ const closeImageUploader = (state, action) => {
   return state.set("openImageUploader", false)
 }
 
-const imageSelected = (state, action) => {
+const imageFilesSelected = (state, action) => {
   return state.set("selectedImageFiles", action.files)
 }
 
@@ -140,6 +140,6 @@ export default chainReducers(
   map("TAGS_RELOADED").to(tagsReloaded),
   map("OPEN_IMAGE_UPLOADER").to(openImageUploader),
   map("CLOSE_IMAGE_UPLOADER").to(closeImageUploader),
-  map("IMAGE_SELECTED").to(imageSelected),
+  map("IMAGE_FILES_SELECTED").to(imageFilesSelected),
 )
 

@@ -37,7 +37,7 @@ const App = ({
       <Col xs={4} md={6}>
         <div className="title">Dave Clay</div>
       </Col>
-      <Col xs={8} md={6} mdHidden>
+      <Col xs={8} smHidden mdHidden lgHidden>
         <DropdownMenu/>
       </Col>
     </Navbar>

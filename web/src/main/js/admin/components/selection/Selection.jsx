@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import keys from "lodash.keys"
+import Tap from "../../../lib/Tap"
 
 class Selection extends React.Component {
 
@@ -77,6 +78,73 @@ class Selection extends React.Component {
     this.setState(nextState);
     window.document.addEventListener('mousemove', this._onMouseMove);
     window.document.addEventListener('mouseup', this._onMouseUp);
+  }
+
+  _onTouchStart = (id, e) => {
+    console.log("touchStart", e)
+    let nextState = {}
+    nextState.touchStart = true;
+    nextState.startPoint = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY
+    };
+    nextState.touchedId = id
+    this.setState(nextState);
+    window.document.addEventListener('touchmove', this._onTouchMove)
+    window.document.addEventListener('touchend', this._onTouchEnd)
+    window.document.addEventListener('touchcancel', this._onTouchCancel)
+  }
+
+  _onTouchMove = (e) => {
+    console.log("_onTouchMove", e)
+    if(this.state.touchStart) {
+      let x = e.touches[0].clientX
+      let y = e.touches[0].clientY
+      let endPoint = {
+        x: x,
+        y: y
+      };
+      this.setState({
+        endPoint: endPoint,
+        touchMoved: (Math.abs(x - this.state.startPoint.x) > 10 || Math.abs(y - this.state.startPoint.y) > 10)
+      });
+    }
+  }
+
+  _onTouchEnd = (e) => {
+    console.log("_onTouchEnd", e)
+    let fireSelection = !this.state.touchMoved
+    let touchedId = this.state.touchedId
+    this._clearTouchEvents()
+    if (fireSelection) {
+      this.selectItem(touchedId, true)
+      this.props.onDoubleClickSelection(this._collectValues());
+      this.setState({
+        touchFiredDoubleClick: true
+      })
+      setTimeout(() => {
+        this.clearSelection()
+      }, 300)
+    }
+  }
+
+  _onTouchCancel = (e) => {
+    this._clearTouchEvents()
+  }
+
+  _clearTouchEvents = () => {
+    window.document.removeEventListener('touchmove', this._onTouchMove)
+    window.document.removeEventListener('touchend', this._onTouchEnd)
+    window.document.removeEventListener('touchcancel', this._onTouchCancel)
+    this.setState({
+      touchedId: null,
+      touchStart: false,
+      startPoint: null,
+      endPoint: null,
+      selectionBox: null,
+      appendMode: false,
+      touchMoved: false
+    });
   }
 
   /**
@@ -159,8 +227,24 @@ class Selection extends React.Component {
         this.props.onDoubleClickSelection(collectValues);
       }
 
-      let handleSelect = (e) => {
+      let handleTouchStart = (e) => {
+        this._onTouchStart(id, e)
+      }
+
+      let handleClickCapture = (e) => {
         if (this.props.enabled) {
+          if (this.state.touchStart) {
+            return;
+          }
+
+          if (this.state.touchFiredDoubleClick) {
+            this.setState({
+              touchFiredDoubleClick: false
+            })
+            return;
+          }
+
+          console.log("handleSelect", e)
           e.persist()
           e.preventDefault();
           e.stopPropagation();
@@ -181,9 +265,10 @@ class Selection extends React.Component {
 
       return (
         <div className={'select-box ' + (isSelected ? 'selected' : '')}
-              ref={id}
-              onDoubleClick={handleDoubleClick}
-              onClickCapture={handleSelect} >
+             ref={id}
+             onDoubleClick={handleDoubleClick}
+             onTouchStart={handleTouchStart}
+             onClickCapture={handleClickCapture}>
           { child }
         </div>
       )

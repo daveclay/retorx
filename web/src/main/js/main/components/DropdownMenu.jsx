@@ -2,7 +2,6 @@ import React from 'react'
 
 import {
   DropdownButton,
-  Dropdown,
   MenuItem
 } from "react-bootstrap"
 
@@ -17,15 +16,20 @@ const buildNavItems = (tags, onSelect) => {
 
 const Menu = ({
   currentTag,
+  showAbout,
   tags,
-  onSelect
+  onSelect,
+  onSelectAbout
 }) => {
+  let title = showAbout ? "About" :
+    (currentTag || "")
   return (
     <DropdownButton className="navbar-menu"
-                    title={currentTag || ""}
+                    title={title}
                     id="category-dropdown"
                     pullRight>
       { buildNavItems(tags, onSelect) }
+      <MenuItem onSelect={onSelectAbout}>About</MenuItem>
       <InstagramMenuItem/>
     </DropdownButton>
   )

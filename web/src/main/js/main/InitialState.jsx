@@ -13,6 +13,7 @@ export default fromJS({
     show: false,
     message: ""
   },
+  showAbout: false,
   tagInfo: {
     "figure constructions":
     "The figure constructions are explorations in engineering art, building up abstract " +

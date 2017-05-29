@@ -195,9 +195,6 @@ a:hover {
 }
 
 #about {
-    display: none;
-    top: 1em;
-    padding: 0;
     margin: 0 auto;
     vertical-align: top;
     text-align: left;

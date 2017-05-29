@@ -12,6 +12,12 @@ export const initialize = (initialTag) => {
   }
 }
 
+export const showAbout = () => {
+  return {
+    type: "SHOW_ABOUT"
+  }
+}
+
 export const loadAllTags = () => {
   return dispatch => {
     imageApi.get("tags")

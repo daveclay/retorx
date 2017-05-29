@@ -6,6 +6,7 @@ import App from "../components/App"
 const mapStateToProps = (state) => {
   return {
     tags: state.get("tags"),
+    showAbout: state.get("showAbout"),
     loader: state.get("loader")
   }
 }

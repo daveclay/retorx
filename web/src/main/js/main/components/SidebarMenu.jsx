@@ -1,8 +1,7 @@
 import React from 'react'
 
 import {
-  Grid,
-  Row
+  MenuItem
 } from "react-bootstrap"
 
 import InstagramMenuItem from "./InstagramMenuItem"
@@ -22,11 +21,13 @@ const buildNavItems = (tags, currentTag, onSelect) => {
 const Menu = ({
   currentTag,
   tags,
-  onSelect
+  onSelect,
+  onSelectAbout
 }) => {
   return (
     <ul className="sidebar-menu col-xs-12 col-sm-3 col-md-2 hidden-xs">
       { buildNavItems(tags, currentTag, onSelect) }
+      <MenuItem onSelect={onSelectAbout}>About</MenuItem>
       <InstagramMenuItem/>
     </ul>
   )

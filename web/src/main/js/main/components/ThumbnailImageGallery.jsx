@@ -80,7 +80,7 @@ const ThumbnailImageGallery = ({
   let reactTagInfo = {
     __html: tagInfo
   }
-  
+
   let tagInfoElement = tagInfo ? <div id="tag-text" dangerouslySetInnerHTML={reactTagInfo}/> : null
 
   return (

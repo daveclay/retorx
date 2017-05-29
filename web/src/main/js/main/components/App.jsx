@@ -11,9 +11,9 @@ import {
   MenuItem
 } from "react-bootstrap"
 
-import DropdownMenu from "../containers/DropdownMenu"
-import SidebarMenu from "../containers/SidebarMenu"
+import { ConnectedDropdownMenu, ConnectedSidebarMenu } from "../containers/Menus"
 import ThumbnailImageGallery from "../containers/ThumbnailImageGallery"
+import About from "./About"
 
 const Loader = ({
   loader
@@ -29,7 +29,8 @@ const Loader = ({
 }
 
 const App = ({
-  loader
+  loader,
+  showAbout,
 }) => (
   <Grid>
     <Loader loader={loader} />
@@ -38,13 +39,17 @@ const App = ({
         <div className="title">Dave Clay</div>
       </Col>
       <Col xs={8} smHidden mdHidden lgHidden>
-        <DropdownMenu/>
+        <ConnectedDropdownMenu/>
       </Col>
     </Navbar>
     <Grid>
       <Row>
-        <SidebarMenu/>
-        <ThumbnailImageGallery/>
+        <ConnectedSidebarMenu/>
+        {
+          showAbout ?
+            <About/> :
+            <ThumbnailImageGallery/>
+        }
       </Row>
     </Grid>
   </Grid>

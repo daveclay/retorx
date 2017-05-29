@@ -45,11 +45,24 @@ const Menu = ({
           {
             tags.map(tag =>
               <NavItem key={tag}
-                   onClick={() => tagSelected(tag)}>
+                       className="visible-xs"
+                       onClick={() => tagSelected(tag)}>
                 {tag}
               </NavItem>
             )
           }
+          <NavDropdown title={currentTag || "..."}
+                       className="hidden-xs"
+                       id="tag-nav-dropdown">
+            {
+              tags.map(tag =>
+                <MenuItem key={tag}
+                         onClick={() => tagSelected(tag)}>
+                  {tag}
+                </MenuItem>
+              )
+            }
+          </NavDropdown>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

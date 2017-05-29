@@ -43,6 +43,7 @@ const renderCaption = (image) => {
 
 const ThumbnailImageGallery = ({
   tag,
+  tagInfo,
   images
 }) => {
 
@@ -76,8 +77,17 @@ const ThumbnailImageGallery = ({
     }
   })
 
+  let reactTagInfo = {
+    __html: tagInfo
+  }
+  
+  let tagInfoElement = tagInfo ? <div id="tag-text" dangerouslySetInnerHTML={reactTagInfo}/> : null
+
   return (
     <div id="gallery" className="col-xs-12 col-sm-9 col-md-10">
+      {
+        tagInfoElement
+      }
       <PhotoSwipeGallery items={items.toJS()}
                          options={options}
                          thumbnailContent={getThumbnailContent}/>

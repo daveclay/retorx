@@ -9,6 +9,8 @@ import org.jboss.resteasy.spi.NotFoundException
 import org.jboss.resteasy.plugins.providers.multipart.{InputPart, MultipartFormDataInput}
 import org.apache.commons.io.IOUtils
 import java.io.{File, FileOutputStream, InputStream}
+import javax.ws.rs.core.Response
+import javax.ws.rs.core.Response.ResponseBuilder
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
@@ -33,14 +35,6 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 	@Produces(Array("text/json"))
 	def getTags = {
 		imageContentDAO.getTags
-	}
-
-	@POST
-	@Path("/css")
-	@Consumes(Array("text/css", "text/plain"))
-	@Produces(Array("application/json"))
-	def saveCSS(css: String) = {
-		siteContentService.saveCSS(css)
 	}
 
 	@POST
@@ -70,6 +64,7 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 
 	@DELETE
 	@Path("/image/{name}.png")
+	@Produces(Array("text/json"))
 	def deleteImageFile(@PathParam("name") name: String) = {
 		withImageContent(name) { imageContent =>
 			imageContent.getImageFileByVersion(name) match {
@@ -85,6 +80,7 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 	@PUT
 	@Path("/image/{name}")
 	@Consumes(Array("multipart/form-data"))
+	@Produces(Array("text/json"))
 	def replaceImageFile(@PathParam("name") name: String,
 						 formDataInput: MultipartFormDataInput) = {
 		withImageContent(name) { imageContent =>
@@ -107,17 +103,20 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 			handleProperties(formDataInput, onPropertiesUploaded)
 			handleFileUpload(formDataInput, onFileUploaded)
 			imageContentDAO.reloadFromFiles()
-			successJson
+
+			imageContent
 		}
 	}
 
 	@POST
 	@Path("/image/{name}")
 	@Consumes(Array("multipart/form-data"))
+	@Produces(Array("text/json"))
 	def addImageFile(@PathParam("name") name: String,
 					 formDataInput: MultipartFormDataInput) = {
 		imageContentDAO.getImageContent(name) match {
-			case Some(imageContent) => throw new IllegalStateException("image file " + name + " already exists")
+			case Some(imageContent) =>
+				unprocessableEntity("image file " + name + " already exists")
 			case None =>
 				val propertiesPromise = Promise[Map[String, String]]()
 				val filePromise = Promise[InputStream]()
@@ -142,7 +141,7 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 					imageContentDAO.reloadFromFiles()
 				}
 
-				successJson
+				imageContentDAO.getImageContent(name)
 		}
 	}
 
@@ -187,19 +186,24 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 
 	@POST
 	@Path("/tag/image/{tag}")
-	@Produces(Array {
-		"text/json"
-	})
+	@Produces(Array("text/json"))
 	def createTagImage(@PathParam("tag") tag: String) = {
 		imageContentDAO.createTagImage(tag)
 	}
 
 	@POST
 	@Path("/tag/randomImage/{tag}")
-	@Produces(Array {
-		"text/json"
-	})
+	@Produces(Array("text/json"))
 	def createRandomTagImage(@PathParam("tag") tag: String) = {
 		imageContentDAO.createTagImage(tag)
+	}
+
+	private def unprocessableEntity(message: String) = {
+		val response = Response
+			.status(422)
+			.entity(s"""{ "message": "$message" }""")
+			.`type`("application/json")
+			.build()
+		throw new WebApplicationException(message, response)
 	}
 }

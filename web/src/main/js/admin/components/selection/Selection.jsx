@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import keys from "lodash.keys"
-import Tap from "../../../lib/Tap"
 
 class Selection extends React.Component {
 
@@ -28,7 +27,6 @@ class Selection extends React.Component {
     startPoint: null,
     endPoint: null,
     selectionBox: null,
-    selectedItems: {},
     appendMode: false
   }
 
@@ -43,11 +41,9 @@ class Selection extends React.Component {
    * On component props change
    */
   componentWillReceiveProps = (nextProps) => {
-    let nextState = {};
-    if(!nextProps.enabled) {
-      nextState.selectedItems = {};
+    if (this.props.tag != nextProps.tag) {
+      this.selectedChildren = {};
     }
-    this.setState(nextState);
   }
 
   /**
@@ -81,7 +77,6 @@ class Selection extends React.Component {
   }
 
   _onTouchStart = (id, e) => {
-    console.log("touchStart", e)
     let nextState = {}
     nextState.touchStart = true;
     nextState.startPoint = {
@@ -96,7 +91,6 @@ class Selection extends React.Component {
   }
 
   _onTouchMove = (e) => {
-    console.log("_onTouchMove", e)
     if(this.state.touchStart) {
       let x = e.touches[0].clientX
       let y = e.touches[0].clientY
@@ -112,7 +106,6 @@ class Selection extends React.Component {
   }
 
   _onTouchEnd = (e) => {
-    console.log("_onTouchEnd", e)
     let fireSelection = !this.state.touchMoved
     let touchedId = this.state.touchedId
     this._clearTouchEvents()
@@ -244,7 +237,6 @@ class Selection extends React.Component {
             return;
           }
 
-          console.log("handleSelect", e)
           e.persist()
           e.preventDefault();
           e.stopPropagation();

@@ -6,6 +6,11 @@ import {
   imageLoaded
 } from "../../main/actions/imageApiActions"
 
+const handleJSONError = (err) => {
+  console.error(err)
+  alert(err.message || err)
+}
+
 const adminApi = jsonApiFor(baseServicesPath + "admin")
 import {
   buildEditorProperties,
@@ -67,7 +72,7 @@ export const menuItemSelected = (menuItem) => {
   }
 }
 
-export const saveImage = (image, editorProperties, files) => {
+export const saveImage = (image, editorProperties, files = null) => {
   const withFile = (f) => {
     if (files && files.length > 0) {
       return f(files[0])
@@ -93,20 +98,29 @@ export const saveImage = (image, editorProperties, files) => {
 
     addEditorPropertiesToFormData(editorProperties, formData)
 
-    adminApi.send({
-      method: image ? "PUT" : "POST",
-      url: `/image/${name}`,
-      headers: {},
-      data: formData
-    }).then(savedPojoImage => {
-      return Immutable.fromJS(savedPojoImage)
-    }).then(savedImage => {
+    saveImageData(name, image, editorProperties, formData)
+      .then(savedPojoImage => {
+        return Immutable.fromJS(savedPojoImage)
+      }).then(savedImage => {
       console.log(`saved image ${savedImage.get("name")}`);
       dispatch(closeSingleImageEditor())
+      dispatch(imageLoaded(savedImage))
+    }).catch(err => {
+      handleJSONError(err)
+    }).then(() => {
       dispatch(showLoader(false))
-      return savedImage
     })
   }
+}
+
+const saveImageData = (name, image, editorProperties, formData = new FormData()) => {
+  addEditorPropertiesToFormData(editorProperties, formData)
+  return adminApi.send({
+    method: image ? "PUT" : "POST",
+    url: `/image/${name}`,
+    headers: {},
+    data: formData
+  })
 }
 
 export const reloadTags = () => {
@@ -114,6 +128,10 @@ export const reloadTags = () => {
     dispatch(showLoader(true))
     adminApi.get("/reloadTags").then(() => {
       console.log("reloaded tags?")
+      dispatch(showLoader(false))
+    }).catch(err => {
+      handleJSONError(err)
+    }).then(() => {
       dispatch(showLoader(false))
     })
   }
@@ -125,6 +143,10 @@ export const reloadFiles = () => {
     adminApi.get("/reloadFromFiles").then(() => {
       console.log("reloaded!")
       dispatch(showLoader(false))
+    }).catch(err => {
+      handleJSONError(err)
+    }).then(() => {
+      dispatch(showLoader(false))
     })
   }
 }
@@ -135,27 +157,21 @@ export const saveMultipleImageProperties = (images, editorProperties) => {
     let total = images.size
     dispatch(showLoader(true, `Saving ${total} images`))
     let promises = images.map(image => {
+      let name = image.get("name");
+
       let imageProperties = image.get("properties")
       let existingEditorProperties = buildEditorProperties(imageProperties)
-      return saveProperties(image, existingEditorProperties.merge(editorProperties)).then(() => {
+      return saveImageData(name, image, existingEditorProperties.merge(editorProperties)).then(() => {
         count++;
-        dispatch(showLoader(true, `Saved ${count} of ${total}`))
+        dispatch(showLoader(true, `Saved ${name} - ${count} of ${total}`))
       })
     })
     Promise.all(promises).then(() => {
       dispatch(closeMultipleImageEditor())
       dispatch(showLoader(false))
-    })
-  }
-}
-
-export const saveSingleImageProperties = (image, editorProperties) => {
-  return dispatch => {
-    dispatch(showLoader(true, `Saving ${image.get("name")}`))
-    saveProperties(image, editorProperties).then(updatedImage => {
-      dispatch(imageLoaded(updatedImage))
+    }).catch(err => {
+      handleJSONError(err)
     }).then(() => {
-      dispatch(closeSingleImageEditor())
       dispatch(showLoader(false))
     })
   }

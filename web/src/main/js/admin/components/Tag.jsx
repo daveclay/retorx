@@ -8,29 +8,30 @@ import Thumbnail from "./Thumbnail"
 class Tag extends React.Component {
 
   renderImages = (images) => {
-  if (images) {
-    return images.map(image => {
+    if (images) {
+      return images.map(image => {
+        return (
+          <SelectionItem key={image.get("id")}
+                         id={image.get("id")}
+                         value={image}>
+            <Thumbnail image={image} />
+          </SelectionItem>
+        )
+      })
+    } else {
+      this.props.onLoad(this.props.tag)
       return (
-        <SelectionItem key={image.get("id")}
-                       id={image.get("id")}
-                       value={image}>
-          <Thumbnail image={image} />
-        </SelectionItem>
+        <div>loading...</div>
       )
-    })
-  } else {
-    this.props.onLoad(this.props.tag)
-    return (
-      <div>loading...</div>
-    )
+    }
   }
-}
 
   render = () => {
     return (
       <Row>
         <Col xs={12}>
-          <Selection onSelectionChange={this.props.onImagesSelected}
+          <Selection tag={this.props.tag}
+                     onSelectionChange={this.props.onImagesSelected}
                      onDoubleClickSelection={this.props.onDoubleClickImages}>
             {
               this.renderImages(this.props.images)

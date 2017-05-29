@@ -3,15 +3,27 @@
 const location = window.location
 const host = `${location.protocol}//${location.hostname}${(location.port ? ':'+location.port: '')}/`
 
+const parseJSONResponse = (res) => {
+  if (!res.ok) {
+    return new Promise((resovle, reject) => {
+      let contentType = res.headers.get("content-type")
+      if (contentType == "text/json" || contentType == "application/json") {
+        return res.json().then(json => reject(json))
+      } else {
+        reject({ "message": res.statusText })
+      }
+    })
+  } else {
+    return res.json()
+  }
+}
+
 export const jsonApiFor = (baseUrl) => {
   const get = (url) => {
     return fetch(host + baseUrl + url, {
       credentials: 'same-origin'
     })
-      .then(res => res.json())
-      .catch(err => {
-        console.error(err);
-      })
+      .then(parseJSONResponse)
   }
 
   const send = (params) => {
@@ -21,10 +33,7 @@ export const jsonApiFor = (baseUrl) => {
       headers: params.headers || { 'Content-Type': 'application/json' },
       credentials: 'same-origin'
     })
-      .then(res => res.json())
-      .catch(err => {
-        console.error(err);
-      })
+      .then(parseJSONResponse)
   }
 
   const post = (params) => {

@@ -118,6 +118,9 @@
                     <groupId>net.alchim31.maven</groupId>
                     <artifactId>scala-maven-plugin</artifactId>
                     <version>3.2.2</version>
+                    <configuration>
+                        <target>1.7</target>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>scala-compile-first</id>
@@ -139,6 +142,9 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <target>1.7</target>
+                    </configuration>
                     <executions>
                         <execution>
                             <phase>compile</phase>

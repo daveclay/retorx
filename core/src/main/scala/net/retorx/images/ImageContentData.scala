@@ -14,7 +14,7 @@ class ImageContentData(originalImageFile: File) {
 
 	private val imageDirectory = originalImageFile.getParentFile
 
-	private val propertiesFile = findPropertiesFile(imageDirectory)
+	private val propertiesFile = PropertiesUtils.findPropertiesFile(imageDirectory)
 	private var properties = parsePropertiesFile(propertiesFile)
 	private var propertiesModified = false
 
@@ -107,7 +107,6 @@ class ImageContentData(originalImageFile: File) {
 	}
 
 	private def savePropertiesFile() {
-		System.out.println(f"Saving properties to $propertiesFile")
 		PropertiesUtils.writeProperties(properties, propertiesFile)
 	}
 
@@ -120,11 +119,12 @@ class ImageContentData(originalImageFile: File) {
 		}
 		val unsortedMap = propertiesAsScalaMap(properties)
 		unsortedMap.foldLeft(new TreeMap[String, String]()) {
-			(map, entry) => map + entry
+			(map, entry) =>
+				if (entry._1.length == 0) {
+					map
+				} else {
+					map + entry
+				}
 		}
-	}
-
-	private def findPropertiesFile(directory: File) = {
-		new File(directory, "info.properties")
 	}
 }

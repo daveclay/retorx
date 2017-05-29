@@ -1,13 +1,15 @@
 package net.retorx
 
 import javax.ws.rs._
-import com.google.inject.{Singleton, Inject}
-import org.jboss.resteasy.annotations.cache.{NoCache, Cache}
+
+import com.google.inject.{Inject, Singleton}
+import org.jboss.resteasy.annotations.cache.{Cache, NoCache}
 import net.retorx.images.ImageContentDAO
+import net.retorx.web.ContentService
 
 @Singleton
 @Path("/images")
-class ImageContentService @Inject() (imageContentDAO:ImageContentDAO) {
+class ImageContentService @Inject() (val imageContentDAO:ImageContentDAO) extends ContentService {
 
     @NoCache
 	@GET
@@ -59,14 +61,15 @@ class ImageContentService @Inject() (imageContentDAO:ImageContentDAO) {
 
     @Cache(maxAge = 3600, isPrivate = false)
     @GET
-    @Path("/image/{version}/{id}.png")
+    @Path("/image/{version}/{name}.png")
     @Produces(Array{"image/png"})
-    def getImageFileByName(@PathParam("id") id: String, @PathParam("version") version: String) = {
-        val imageContent = getImageContent(id)
-        imageContent.getImageFileByVersion(version) match {
-            case Some(imageFile) => imageFile.file
-            case None => None
-        }
+	def getImageFileByName(@PathParam("name") name: String, @PathParam("version") version: String) = {
+		withImageContent(name) { imageContent =>
+			imageContent.getImageFileByVersion(version) match {
+				case Some(imageFile) => imageFile.file
+				case None => None
+			}
+		}
     }
 
 	private def pause() {

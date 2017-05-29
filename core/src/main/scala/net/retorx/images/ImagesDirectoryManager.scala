@@ -1,12 +1,15 @@
 package net.retorx.images
 
 import com.google.inject.name.Named
-import java.io.File
+import java.io.{File, FileOutputStream, InputStream}
 import java.util
 
 import com.google.inject.{Inject, Singleton}
-import org.apache.commons.io.FileUtils
+import net.retorx.util.PropertiesUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
 import net.retorx.{ImageContent, ImageFile}
+
+import scala.collection.parallel.ForkJoinTaskSupport
 
 @Singleton
 class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
@@ -23,7 +26,9 @@ class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 		}
 
 		val files = imagesDir.listFiles()
-		val total = files.size
+		val parFilesList = files.par
+		// Let's not run out of file handles, eh?
+		parFilesList.tasksupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(4))
 		files.par.foreach { file  =>
 			try {
 				managerType.buildImageContent(file) match {
@@ -43,12 +48,23 @@ class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 		}
 	}
 
+	def addImage(name: String, properties: Map[String, String], inputStream: InputStream) {
+		val imageDirectory = new File(imagesDir, name)
+		if (imageDirectory.exists()) {
+			throw new IllegalStateException(s"Directory ${imageDirectory} exists")
+		}
+		imageDirectory.mkdirs()
+		IOUtils.copy(inputStream, new FileOutputStream(new File(imageDirectory, name + ".png")))
+		val propertiesFile = PropertiesUtils.findPropertiesFile(imageDirectory)
+		PropertiesUtils.writeProperties(properties, propertiesFile)
+	}
+
 	def deleteImageFile(imageFile: ImageFile) {
 		val file = imageFile.file
 		file.delete()
 	}
 
-	def renameTag(existingTag: String, newTag: String) = {
+	def renameTag(existingTag: String, newTag: String) {
 		val tags = getDefaultTags
 		val save = (updatedTags: Array[String]) => {
 			getTagFile match {

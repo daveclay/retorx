@@ -26,36 +26,63 @@
 
     <properties>
         <encoding>UTF-8</encoding>
-        <scala.version>2.11.8</scala.version>
-        <jackson.version>2.8.5</jackson.version>
+        <scala.version>2.12.1</scala.version>
+        <specs.version>3.8.9</specs.version>
+        <jackson.version>2.8.8</jackson.version>
         <github.maven.repository>file:///Users/daveclay/work/mvn-artifacts/</github.maven.repository>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
         <!-- Test -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.specs2</groupId>
-            <artifactId>specs2-core_2.11</artifactId>
-            <version>3.8.5</version>
+            <artifactId>specs2-core_2.12</artifactId>
+            <version>${specs.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <!-- make sure wrong scala version is not pulled in -->
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.specs2</groupId>
-            <artifactId>specs2-mock_2.11</artifactId>
-            <version>3.8.5</version>
+            <artifactId>specs2-mock_2.12</artifactId>
+            <version>${specs.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <!-- make sure wrong scala version is not pulled in -->
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.specs2</groupId>
-            <artifactId>specs2-junit_2.11</artifactId>
-            <version>3.8.5</version>
+            <artifactId>specs2-junit_2.12</artifactId>
+            <version>${specs.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <!-- make sure wrong scala version is not pulled in -->
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>

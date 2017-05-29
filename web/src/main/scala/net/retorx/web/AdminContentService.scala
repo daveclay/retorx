@@ -3,19 +3,27 @@ package net.retorx.web
 import javax.ws.rs._
 
 import com.google.inject.{Inject, Singleton}
-import net.retorx.images.ImageContentDAO
+import net.retorx.images.{ImageContentDAO, ImagesDirectoryManager}
 import net.retorx.config.SiteContentService
 import org.jboss.resteasy.spi.NotFoundException
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput
+import org.jboss.resteasy.plugins.providers.multipart.{InputPart, MultipartFormDataInput}
 import org.apache.commons.io.IOUtils
-import java.io.{File, FileOutputStream}
+import java.io.{File, FileOutputStream, InputStream}
+import javax.ws.rs.core.Response
+import javax.ws.rs.core.Response.ResponseBuilder
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.jboss.resteasy.annotations.cache.NoCache
+
+import scala.concurrent.Promise
 
 @Path("/admin")
 @Singleton
-class AdminContentService @Inject()(imageContentDAO: ImageContentDAO,
-									siteContentService: SiteContentService) {
+class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
+									imagesDirectoryManager: ImagesDirectoryManager,
+									siteContentService: SiteContentService) extends ContentService {
 
 	val multipartHandler = new MultipartHandler()
 
@@ -30,14 +38,6 @@ class AdminContentService @Inject()(imageContentDAO: ImageContentDAO,
 	}
 
 	@POST
-	@Path("/css")
-	@Consumes(Array("text/css", "text/plain"))
-	@Produces(Array("application/json"))
-	def saveCSS(css: String) = {
-		siteContentService.saveCSS(css)
-	}
-
-	@POST
 	@Path("rename/{tag}")
 	@Consumes(Array("text/json", "application/json", "application/vnd.imageContent+json"))
 	@Produces(Array("text/json"))
@@ -47,52 +47,127 @@ class AdminContentService @Inject()(imageContentDAO: ImageContentDAO,
 	}
 
 	@POST
-	@Path("{id}/properties")
+	@Path("/image/{name}/properties")
 	@Consumes(Array("text/json", "application/json", "application/vnd.imageContent+json"))
 	@Produces(Array("application/vnd.imageContent+json"))
-	def saveProperties(@PathParam("id") id: String, properties: java.util.Map[String, String]) = {
-		val imageContent = imageContentDAO.getImageContent(id)
-		val wrapped = scala.collection.JavaConversions.mapAsScalaMap(properties)
-		imageContent.setProperties(wrapped.toMap)
-		imageContent.savePropertiesFile()
-		// a little overzealous, but whatever - how long does it take to determine whether tags have changed vs
-		// just reloading the damned tags?
-		imageContentDAO.reloadTags()
-		successJson
+	def saveProperties(@PathParam("name") name: String, properties: java.util.Map[String, String]) = {
+		withImageContent(name) { imageContent =>
+			val wrapped = scala.collection.JavaConversions.mapAsScalaMap(properties)
+			imageContent.setProperties(wrapped.toMap)
+			imageContent.savePropertiesFile()
+			// a little overzealous, but whatever - how long does it take to determine whether tags have changed vs
+			// just reloading the damned tags?
+			imageContentDAO.reloadTags()
+			imageContent
+		}
 	}
 
 	@DELETE
-	@Path("/image/{id}/{name}.png")
-	def deleteImageFile(@PathParam("id") id: String, @PathParam("name") name: String) = {
-		val imageContent = imageContentDAO.getImageContent(id)
-		imageContent.getImageFileByVersion(name) match {
-			case Some(imageFile) =>
-				imageContentDAO.deleteImageFileForImage(imageContent, imageFile)
-				successJson
-			case None =>
-				throw new NotFoundException("image file " + name + " does not exist")
+	@Path("/image/{name}.png")
+	@Produces(Array("text/json"))
+	def deleteImageFile(@PathParam("name") name: String) = {
+		withImageContent(name) { imageContent =>
+			imageContent.getImageFileByVersion(name) match {
+				case Some(imageFile) =>
+					imageContentDAO.deleteImageFileForImage(imageContent, imageFile)
+					successJson
+				case None =>
+					throw new NotFoundException("image file " + name + " does not exist")
+			}
 		}
 	}
 
 	@PUT
-	@Path("/image/{id}/{name}.png")
-	def replaceImageFile(@PathParam("id") id: String,
-						 @PathParam("name") name: String,
-						 input: MultipartFormDataInput) = {
-		val imageContent = imageContentDAO.getImageContent(id)
-		imageContent.getImageFileByVersion(name) match {
-			case Some(imageFile) =>
-				multipartHandler.handleMultipartData(input, (filename, inputStream) => {
-					val file = imageFile.file
-					val originalModifiedDate = file.lastModified()
-					IOUtils.copy(inputStream, new FileOutputStream(file))
-					// TODO: re-create thumbnails and size properties. But, meh, who cares.
-					imageContentDAO.replaceOriginalImage(imageContent)
-					file.setLastModified(originalModifiedDate)
-				})
-			case None =>
-				throw new NotFoundException("image file " + name + " does not exist")
+	@Path("/image/{name}")
+	@Consumes(Array("multipart/form-data"))
+	@Produces(Array("text/json"))
+	def replaceImageFile(@PathParam("name") name: String,
+						 formDataInput: MultipartFormDataInput) = {
+		withImageContent(name) { imageContent =>
+			val onPropertiesUploaded = (properties: Map[String, String]) => {
+				imageContent.setProperties(properties)
+				imageContent.savePropertiesFile()
+			}
+
+			val onFileUploaded = (inputStream: InputStream) => {
+				imageContent.getImageFileByVersion("original") match {
+					case Some(imageFile) =>
+						IOUtils.copy(inputStream, new FileOutputStream(imageFile.file))
+						imageContentDAO.replaceOriginalImage(imageContent)
+					case None =>
+						throw new NotFoundException("Somehow don't have an original file.")
+
+				}
+			}
+
+			handleProperties(formDataInput, onPropertiesUploaded)
+			handleFileUpload(formDataInput, onFileUploaded)
+			imageContentDAO.reloadFromFiles()
+
+			imageContent
 		}
+	}
+
+	@POST
+	@Path("/image/{name}")
+	@Consumes(Array("multipart/form-data"))
+	@Produces(Array("text/json"))
+	def addImageFile(@PathParam("name") name: String,
+					 formDataInput: MultipartFormDataInput) = {
+		imageContentDAO.getImageContent(name) match {
+			case Some(imageContent) =>
+				unprocessableEntity("image file " + name + " already exists")
+			case None =>
+				val propertiesPromise = Promise[Map[String, String]]()
+				val filePromise = Promise[InputStream]()
+
+				val onPropertiesUploaded = (properties: Map[String, String]) => {
+					propertiesPromise.success(properties)
+				}
+
+				val onFileUploaded = (inputStream: InputStream) => {
+					filePromise.success(inputStream)
+				}
+
+				handleProperties(formDataInput, onPropertiesUploaded)
+				handleFileUpload(formDataInput, onFileUploaded)
+
+
+				for {
+					properties <- propertiesPromise.future.value.get
+					inputStream <- filePromise.future.value.get
+				} yield {
+					imagesDirectoryManager.addImage(name, properties, inputStream)
+					imageContentDAO.reloadFromFiles()
+				}
+
+				imageContentDAO.getImageContent(name)
+		}
+	}
+
+	private def handleProperties[T](formDataInput: MultipartFormDataInput,
+									onPropertiesUploaded: (Map[String, String] => T)) = {
+		val propertiesInputPart = getFormDataMap(formDataInput)("properties").get(0)
+		val mapper = new ObjectMapper() with ScalaObjectMapper
+		mapper.registerModule(DefaultScalaModule)
+		val properties = mapper.readValue(propertiesInputPart.getBodyAsString, classOf[Map[String, String]])
+		onPropertiesUploaded(properties)
+	}
+
+	private def handleFileUpload[T](formDataInput: MultipartFormDataInput,
+									onFileUploaded: (InputStream) => T) = {
+		getFormDataMap(formDataInput).get("image") match {
+			case Some(imageInputParts) =>
+				val imageInputPart = imageInputParts.get(0)
+				val inputStream = imageInputPart.getBody(classOf[InputStream], null)
+				onFileUploaded(inputStream)
+			case None =>
+		}
+	}
+
+	private def getFormDataMap(formDataInput: MultipartFormDataInput) = {
+		import scala.collection.JavaConverters._
+		formDataInput.getFormDataMap.asScala
 	}
 
 	@GET
@@ -111,19 +186,24 @@ class AdminContentService @Inject()(imageContentDAO: ImageContentDAO,
 
 	@POST
 	@Path("/tag/image/{tag}")
-	@Produces(Array {
-		"text/json"
-	})
+	@Produces(Array("text/json"))
 	def createTagImage(@PathParam("tag") tag: String) = {
 		imageContentDAO.createTagImage(tag)
 	}
 
 	@POST
 	@Path("/tag/randomImage/{tag}")
-	@Produces(Array {
-		"text/json"
-	})
+	@Produces(Array("text/json"))
 	def createRandomTagImage(@PathParam("tag") tag: String) = {
 		imageContentDAO.createTagImage(tag)
+	}
+
+	private def unprocessableEntity(message: String) = {
+		val response = Response
+			.status(422)
+			.entity(s"""{ "message": "$message" }""")
+			.`type`("application/json")
+			.build()
+		throw new WebApplicationException(message, response)
 	}
 }

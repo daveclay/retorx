@@ -1,7 +1,8 @@
 package net.retorx.web
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput
+import org.jboss.resteasy.plugins.providers.multipart.{InputPart, MultipartFormDataInput}
 import javax.ws.rs.core.MultivaluedMap
+
 import scala.collection.JavaConverters._
 import java.io.InputStream
 
@@ -9,20 +10,15 @@ class MultipartHandler {
 
     def handleMultipartData(input: MultipartFormDataInput,
                             f: (Option[String], InputStream) => Unit) {
-        handleMultipartData("file", input, f)
-    }
-
-    def handleMultipartData(fileInputField: String,
-                            input: MultipartFormDataInput,
-                           f: (Option[String], InputStream) => Unit) {
-        val uploadForm = input.getFormDataMap
-        val inputParts = uploadForm.get(fileInputField).asScala
-        inputParts.foreach(inputPart => {
-            val headers = inputPart.getHeaders
-            val filename = findFileName(headers)
-            val inputStream = inputPart.getBody(classOf[InputStream], null)
-            f(filename, inputStream)
-        })
+		val formDataMap = input.getFormDataMap.asScala
+		for ((name, inputParts) <- formDataMap) {
+			inputParts.asScala.foreach(inputPart => {
+				val headers = inputPart.getHeaders
+				val filename = findFileName(headers)
+				val inputStream = inputPart.getBody(classOf[InputStream], null)
+				f(filename, inputStream)
+			})
+		}
     }
 
     /**

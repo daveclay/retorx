@@ -6,6 +6,8 @@ import {
   MenuItem
 } from "react-bootstrap"
 
+import InstagramMenuItem from "./InstagramMenuItem"
+
 const buildNavItems = (tags, onSelect) => {
   return tags.map(tag => {
     return <MenuItem key={tag}
@@ -24,6 +26,7 @@ const Menu = ({
                     id="category-dropdown"
                     pullRight>
       { buildNavItems(tags, onSelect) }
+      <InstagramMenuItem/>
     </DropdownButton>
   )
 }

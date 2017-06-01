@@ -15,8 +15,6 @@ import {
 import {
   src,
   dateText,
-  buildShareURL,
-  buildSelectedIndexOptions
 } from "../../lib/imageData"
 
 const renderCaption = (image) => {
@@ -41,14 +39,68 @@ const renderCaption = (image) => {
     `
 }
 
+class ShareButtonHandler {
+  constructor(images) {
+    this.images = images
+  }
+
+  setCurrentImage(index) {
+    this.currentImage = this.images.get(index)
+  }
+
+  getShareButtonURL(shareButtonData) {
+    /*
+     Object {id: "twitter", label: "Tweet", url: "https://twitter.com/intent/tweet?text={{text}}&url={{url}}"}id: "twitter"label: "Tweet"url: "https://twitter.com/intent/tweet?text={{text}}&url={{url}}"__proto__: Object
+     */
+    /*
+     Object {id: "pinterest", label: "Pin it", url: "http://www.pinterest.com/pin/create/button/?url={{url}}&media={{image_url}}&description={{text}}"}id: "pinterest"label: "Pin it"url: "http://www.pinterest.com/pin/create/button/?url={{url}}&media={{image_url}}&description={{text}}"__proto__: Object
+     */
+    /*
+     Object {id: "download", label: "Download image", url: "{{raw_image_url}}", download: true}download: trueid: "download"label: "Download image"url: "{{raw_image_url}}"__proto__: Object
+     */
+    // {
+    // id:'facebook',
+    // label:'Share on Facebook',
+    // url:'https://www.facebook.com/sharer/sharer.php?u={{url}}&picture={{raw_image_url}}&description={{text}}'}
+
+    console.log(shareButtonData);
+    let original = this.currentImage.get("imageFilesByVersion").get("original")
+    let pictureUrl = "http://daveclay.com/" + src(this.currentImage, "original")
+    let description = this.currentImage.get("name")
+    let tag = this.currentImage.get("tags").get(0)
+    let shareUrl = "http://daveclay.com/" + tag + "/" + description
+
+    /*
+     https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fdaveclay.com%2Fart%2Ffigure%20painting%2Ftransmission%26picture%3Dservices%2Fimages%2Fimage%2Foriginal%2Ftransmission.png%26description%3Dtransmission
+     */
+
+    // TODO: this is hard-coded to fb
+    let shareData = {
+      id: 'facebook',
+      label: 'Share on Facebook',
+      url: 'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl + '&picture=' + pictureUrl + '&description=' + description
+    };
+
+    console.log(shareData.url)
+
+    return shareData;
+  }
+}
+
 const ThumbnailImageGallery = ({
   tag,
   tagInfo,
   images
 }) => {
 
+  let shareButtonHandler = new ShareButtonHandler(images)
+
   if (!tag) {
     return <span/>
+  }
+
+  let buildShareURL = (shareButtonData) => {
+    return shareButtonHandler.getShareButtonURL(shareButtonData)
   }
 
   let options = {
@@ -81,6 +133,10 @@ const ThumbnailImageGallery = ({
     __html: tagInfo
   }
 
+  let onChange = (photoSwipe) => {
+    shareButtonHandler.setCurrentImage(photoSwipe.getCurrentIndex())
+  }
+
   let tagInfoElement = tagInfo ? <div id="tag-text" dangerouslySetInnerHTML={reactTagInfo}/> : null
 
   return (
@@ -90,6 +146,7 @@ const ThumbnailImageGallery = ({
       }
       <PhotoSwipeGallery items={items.toJS()}
                          options={options}
+                         beforeChange={onChange}
                          thumbnailContent={getThumbnailContent}/>
     </div>
   )

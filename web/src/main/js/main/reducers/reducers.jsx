@@ -6,10 +6,6 @@ const tagsLoaded = (state, action) => {
   return state.set("tags", action.tags.filterNot(tag => tag == 'uncategorized'))
 }
 
-const tagSelected = (state, action) => {
-  return state.set("showAbout", false)
-}
-
 const showAbout = (state) => {
   return state.set("showAbout", true)
 }

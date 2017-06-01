@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
   entry: {
@@ -7,12 +8,12 @@ module.exports = {
     admin: ['babel-polyfill', './src/main/js/admin/app.jsx' ],
   },
   output: {
-    path: "./src/main/webapp",
+    path: path.resolve(__dirname, 'src/main/webapp'),
     filename: "js/[name].bundle.js",
     chunkFilename: "[id].chunk.js"
   },
   resolve: {
-    extensions: ['', '.js', '.jsx'],
+    extensions: ['.js', '.jsx'],
     alias: {
       lib: path.join(process.cwd(), 'app', 'lib'),
       react: path.resolve('./node_modules/react'),
@@ -20,24 +21,34 @@ module.exports = {
     },
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.(js|jsx)?$/,
-        loader: 'babel-loader',
+        use: [
+          {
+            loader: 'babel-loader',
+          }
+        ],
         exclude: /node_modules/,
       },
       {
-        test: /\.json$/,
-        loader: "json-loader"
-      },
-      {
         test: /\.css$/,
-        loader: "style-loader!css-loader"
+        use: ExtractTextPlugin.extract({
+          fallback: "style-loader",
+          use: "css-loader",
+        })
       },
       {
         test: /\.(gif|jpg|png|svg)$/,
-        loader: 'file-loader?name=images/[name].[ext]'
+        use: [
+          {
+            loader: 'file-loader?name=images/[name].[ext]'
+          }
+        ]
       },
     ]
-  }
+  },
+  plugins: [
+    new ExtractTextPlugin('css/[name].css')
+  ]
 };

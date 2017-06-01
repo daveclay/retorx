@@ -15,6 +15,7 @@
   <meta name="description" content="art of daveclay">
   <title>Dave Clay Art</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/main.css">
 </head>
 <body>
 <div id="root"></div>

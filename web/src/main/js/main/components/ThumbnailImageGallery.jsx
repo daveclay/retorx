@@ -54,48 +54,15 @@ class ShareButtonHandler {
   }
 
   getPageURLForShare( shareButtonData ) {
-    return window.location.href;
+    let name = this.currentImage.get("name")
+    let tag = this.currentImage.get("tags").get(0)
+    return `http://daveclay.com/art/${tag}/${name}`
   }
 
   getTextForShare( shareButtonData ) {
-    return this.currentImage.get("name") || '';
-  }
-
-  getShareButtonURL(shareButtonData) {
-    /*
-     Object {id: "twitter", label: "Tweet", url: "https://twitter.com/intent/tweet?text={{text}}&url={{url}}"}id: "twitter"label: "Tweet"url: "https://twitter.com/intent/tweet?text={{text}}&url={{url}}"__proto__: Object
-     */
-    /*
-     Object {id: "pinterest", label: "Pin it", url: "http://www.pinterest.com/pin/create/button/?url={{url}}&media={{image_url}}&description={{text}}"}id: "pinterest"label: "Pin it"url: "http://www.pinterest.com/pin/create/button/?url={{url}}&media={{image_url}}&description={{text}}"__proto__: Object
-     */
-    /*
-     Object {id: "download", label: "Download image", url: "{{raw_image_url}}", download: true}download: trueid: "download"label: "Download image"url: "{{raw_image_url}}"__proto__: Object
-     */
-    // {
-    // id:'facebook',
-    // label:'Share on Facebook',
-    // url:'https://www.facebook.com/sharer/sharer.php?u={{url}}&picture={{raw_image_url}}&description={{text}}'}
-
-    let original = this.currentImage.get("imageFilesByVersion").get("original")
-    let pictureUrl = encodeURIComponent("http://daveclay.com/" + src(this.currentImage, "original"))
-    let name = this.currentImage.get("name")
-    let tag = this.currentImage.get("tags").get(0)
-    let shareUrl = encodeURIComponent("http://daveclay.com/art/" + tag + "/" + name)
-
-    /*
-     https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fdaveclay.com%2Fart%2Ffigure%20painting%2Ftransmission%26picture%3Dservices%2Fimages%2Fimage%2Foriginal%2Ftransmission.png%26description%3Dtransmission
-     */
-
-    // TODO: this is hard-coded to fb
-    let shareData = {
-      id: 'facebook',
-      label: 'Share on Facebook',
-      url: 'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl + '&picture=' + pictureUrl + '&description=' + encodeURIComponent(name)
-    };
-
-    console.log(shareData.url)
-
-    return shareData;
+    let customName = this.currentImage.get("customName");
+    let info = this.currentImage.get("info");
+    return `${customName} by artist Dave Clay. ${info}`
   }
 }
 
@@ -111,16 +78,11 @@ const ThumbnailImageGallery = ({
     return <span/>
   }
 
-  let buildShareURL = (shareButtonData) => {
-    return shareButtonHandler.getShareButtonURL(shareButtonData)
-  }
-
   let options = {
     galleryPIDs: true,
     galleryUID: tag,
     showHideOpacity: true,
     getThumbBoundsFn: getThumbBoundsFn,
-    //getImageURLForShare: buildShareURL
     getImageURLForShare: function( shareButtonData ) {
       return shareButtonHandler.getImageURLForShare(shareButtonData)
     },

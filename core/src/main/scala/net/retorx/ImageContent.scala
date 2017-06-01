@@ -10,7 +10,7 @@ class ImageContent(val name: String,
 				   @JsonIgnore val imageDirectory: File,
 				   val imageFilesByVersion: Map[String, ImageFile]) extends Content with Ordered[ImageContent] {
 
-	val imageFiles = imageFilesByVersion.valuesIterator.toSeq.sortBy((imageFile) => imageFile.name)
+	private val imageFiles = imageFilesByVersion.valuesIterator.toSeq.sortBy((imageFile) => imageFile.name)
 
 	def getImageFiles = imageFiles
 
@@ -18,6 +18,20 @@ class ImageContent(val name: String,
 		properties.get("hidden") match {
 			case Some(hidden) => hidden.toBoolean
 			case None => false
+		}
+	}
+
+	def getCustomName = {
+		properties.get("name") match {
+			case Some(customName) => customName
+			case None => name
+		}
+	}
+
+	def getInfo = {
+		properties.get("info") match {
+			case Some(info) => info
+			case None => ""
 		}
 	}
 

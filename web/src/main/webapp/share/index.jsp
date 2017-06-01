@@ -1,8 +1,13 @@
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="org.apache.http.client.utils.URLEncodedUtils" %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ page import="com.google.common.net.PercentEscaper" %>
-<%!
+<%@ page import="net.retorx.ImageContent" %>
+<%@ page import="org.apache.commons.lang3.StringEscapeUtils" %>
+<%
   PercentEscaper e = new PercentEscaper("", false);
+  ImageContent imageContent = (ImageContent) request.getAttribute("imageContent");
+  String name = imageContent != null ? imageContent.getCustomName() : "";
+  String info = imageContent != null ? imageContent.getInfo() : "";
+
 %>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:fb="http://ogp.me/ns/fb#">
@@ -11,9 +16,11 @@
   <link rel="shortcut icon" href="http://daveclay.com/favicon.png" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Art of Dave Clay" />
-  <meta property="og:description" content="<%= request.getParameter("pid") %> by artist Dave Clay." />
+  <meta property="og:description" content="<%= name %> by artist Dave Clay. <%= StringEscapeUtils.escapeHtml4(info) %>" />
   <meta property="og:url" content="http://daveclay.com/share/?gid=<%= e.escape(request.getParameter("gid")) %>&pid=<%= e.escape(request.getParameter("pid")) %>" />
   <meta property="og:image" content="http://daveclay.com/services/images/image/scaled/<%= e.escape(request.getParameter("pid")) %>.png" />
+  <meta property="og:image:width" content="<%= imageContent.getImageFileByVersion("scaled").get().width() %>"/>
+  <meta property="og:image:height" content="<%= imageContent.getImageFileByVersion("scaled").get().height() %>"/>
   <meta name="viewport"
         content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />

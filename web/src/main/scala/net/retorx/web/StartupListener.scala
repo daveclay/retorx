@@ -12,10 +12,8 @@ class StartupListener extends GuiceResteasyBootstrapServletContextListener {
     var servletContextOpt = None
 
 	override def getModules(context: ServletContext): util.List[RetorxModule] = {
-		util.Arrays.asList(new RetorxModule(new InitParamLookup {
-			override def getInitParameter(name: String): String = {
-				context.getInitParameter(name)
-			}
+		util.Arrays.asList(new RetorxModule((name: String) => {
+			context.getInitParameter(name)
 		}))
 	}
 

@@ -18,16 +18,16 @@ const parseJSONResponse = (res) => {
   }
 }
 
-export const jsonApiFor = (baseUrl) => {
-  const get = (url) => {
-    return fetch(host + baseUrl + url, {
+export const jsonApiFor = (urlBuilder) => {
+  const get = (path) => {
+    return fetch(urlBuilder(path), {
       credentials: 'same-origin'
     })
       .then(parseJSONResponse)
   }
 
   const send = (params) => {
-    return fetch(host + baseUrl + params.url, {
+    return fetch(urlBuilder(params.path), {
       method: params.method,
       body: params.data,
       headers: params.headers || { 'Content-Type': 'application/json' },

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context
-        antiResourceLocking="false"
-        cachingAllowed="false" >
+<Context antiResourceLocking="false"
+         cachingAllowed="false" >
+    <Valve className="org.apache.catalina.valves.rewrite.RewriteValve" />
     <Parameter
             name="content.dir"
             value="/Users/daveclay/work/retorx/content"/>

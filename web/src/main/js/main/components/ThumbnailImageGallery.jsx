@@ -48,6 +48,19 @@ class ShareButtonHandler {
     this.currentImage = this.images.get(index)
   }
 
+  getImageURLForShare( shareButtonData ) {
+    let original = this.currentImage.get("imageFilesByVersion").get("original")
+    return "http://daveclay.com/" + src(this.currentImage, "original")
+  }
+
+  getPageURLForShare( shareButtonData ) {
+    return window.location.href;
+  }
+
+  getTextForShare( shareButtonData ) {
+    return this.currentImage.get("name") || '';
+  }
+
   getShareButtonURL(shareButtonData) {
     /*
      Object {id: "twitter", label: "Tweet", url: "https://twitter.com/intent/tweet?text={{text}}&url={{url}}"}id: "twitter"label: "Tweet"url: "https://twitter.com/intent/tweet?text={{text}}&url={{url}}"__proto__: Object
@@ -63,12 +76,11 @@ class ShareButtonHandler {
     // label:'Share on Facebook',
     // url:'https://www.facebook.com/sharer/sharer.php?u={{url}}&picture={{raw_image_url}}&description={{text}}'}
 
-    console.log(shareButtonData);
     let original = this.currentImage.get("imageFilesByVersion").get("original")
-    let pictureUrl = "http://daveclay.com/" + src(this.currentImage, "original")
-    let description = this.currentImage.get("name")
+    let pictureUrl = encodeURIComponent("http://daveclay.com/" + src(this.currentImage, "original"))
+    let name = this.currentImage.get("name")
     let tag = this.currentImage.get("tags").get(0)
-    let shareUrl = "http://daveclay.com/" + tag + "/" + description
+    let shareUrl = encodeURIComponent("http://daveclay.com/art/" + tag + "/" + name)
 
     /*
      https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fdaveclay.com%2Fart%2Ffigure%20painting%2Ftransmission%26picture%3Dservices%2Fimages%2Fimage%2Foriginal%2Ftransmission.png%26description%3Dtransmission
@@ -78,7 +90,7 @@ class ShareButtonHandler {
     let shareData = {
       id: 'facebook',
       label: 'Share on Facebook',
-      url: 'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl + '&picture=' + pictureUrl + '&description=' + description
+      url: 'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl + '&picture=' + pictureUrl + '&description=' + encodeURIComponent(name)
     };
 
     console.log(shareData.url)
@@ -108,7 +120,17 @@ const ThumbnailImageGallery = ({
     galleryUID: tag,
     showHideOpacity: true,
     getThumbBoundsFn: getThumbBoundsFn,
-    getImageURLForShare: buildShareURL
+    //getImageURLForShare: buildShareURL
+    getImageURLForShare: function( shareButtonData ) {
+      return shareButtonHandler.getImageURLForShare(shareButtonData)
+    },
+    getPageURLForShare: function( shareButtonData ) {
+      return shareButtonHandler.getPageURLForShare(shareButtonData)
+    },
+    getTextForShare: function( shareButtonData ) {
+      return shareButtonHandler.getTextForShare(shareButtonData)
+    },
+
   };
 
   let getThumbnailContent = (imageGalleryItem) => {
@@ -125,7 +147,7 @@ const ThumbnailImageGallery = ({
       w: scaledImageFile.get("width"),
       h: scaledImageFile.get("height"),
       title: renderCaption(image),
-      pid: image.id
+      pid: image.get("name")
     }
   })
 

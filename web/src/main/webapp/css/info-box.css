@@ -1,8 +1,0 @@
-#ContactFormInfoBox, #AboutInfoBox, #PrintsInfoBox {
-	position: absolute;
-	width: 500px;
-	height: 250px;
-	top: -250px;
-	left: 23px;
-	overflow-y: auto;
-}

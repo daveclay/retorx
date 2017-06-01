@@ -1,7 +1,7 @@
 import Immutable from "immutable"
 
 import { jsonApiFor } from "../../lib/api"
-import { baseServicesPath } from "../../main/constants/constants"
+import { baseAdminContentServicePathBuilder } from "../../lib/paths"
 import {
   imageLoaded
 } from "../../main/actions/imageApiActions"
@@ -11,7 +11,7 @@ const handleJSONError = (err) => {
   alert(err.message || err)
 }
 
-const adminApi = jsonApiFor(baseServicesPath + "admin")
+const adminApi = jsonApiFor(baseAdminContentServicePathBuilder)
 import {
   buildEditorProperties,
   addEditorPropertiesToFormData
@@ -117,7 +117,7 @@ const saveImageData = (name, image, editorProperties, formData = new FormData())
   addEditorPropertiesToFormData(editorProperties, formData)
   return adminApi.send({
     method: image ? "PUT" : "POST",
-    url: `/image/${name}`,
+    path: `/image/${name}`,
     headers: {},
     data: formData
   })

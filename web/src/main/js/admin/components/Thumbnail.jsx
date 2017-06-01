@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { baseImageContentServicePath } from "../../main/constants/constants"
+import { baseImageContentServicePathBuilder } from "../../lib/paths"
 
 class Thumbnail extends React.Component {
   constructor(props) {
@@ -17,9 +17,8 @@ class Thumbnail extends React.Component {
     let fadeClassName = this.state.loaded ? "fadeIn " : "transparent "
     let className = `${fadeClassName}${hiddenClassName}`
 
-    let thumbnail = image.get("imageFilesByVersion").get("thumbnail");
-    let src = baseImageContentServicePath + "image/thumbnail/" + image.get("name") + ".png";
-
+    let thumbnail = image.get("imageFilesByVersion").get("thumbnail")
+    let src = baseImageContentServicePathBuilder("image/thumbnail/" + image.get("name") + ".png")
 
     return (
       <div className="thumbnail">

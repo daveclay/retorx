@@ -5,7 +5,7 @@
   <link rel="shortcut icon" href="http://daveclay.com/favicon.png" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="daveclay.com" />
-  <meta property="og:description" content="art of daveclay" />
+  <meta property="og:description" content="Art of Dave Clay" />
   <meta property="og:image" content="http://www.daveclay.com/fb.png" />
   <meta name="viewport"
         content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>

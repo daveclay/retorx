@@ -41,7 +41,9 @@ const SingleImageEditor = ({
                                            onChangeValue={onChangeValue} />
             : <span/>
           }
-          <input type="file" onChange={handleFileChange} />
+          <br/>
+          <br/>
+          <input className="btn btn-lg btn-primary" type="file" onChange={handleFileChange} />
         </Form>
       </Modal.Body>
       <Modal.Footer>

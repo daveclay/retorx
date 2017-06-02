@@ -8,7 +8,13 @@ import {
 
 const handleJSONError = (err) => {
   console.error(err)
-  alert(err.message || err)
+  if (err.message) {
+    alert(err.message)
+  } else if (err.responseText) {
+    alert(err.responseText)
+  } else {
+    alert(err)
+  }
 }
 
 const adminApi = jsonApiFor(baseAdminContentServicePathBuilder)
@@ -117,7 +123,7 @@ const saveImageData = (name, image, editorProperties, formData = new FormData())
   addEditorPropertiesToFormData(editorProperties, formData)
   return adminApi.send({
     method: image ? "PUT" : "POST",
-    path: `/image/${name}`,
+    path: `image/${name}`,
     headers: {},
     data: formData
   })
@@ -126,7 +132,7 @@ const saveImageData = (name, image, editorProperties, formData = new FormData())
 export const reloadTags = () => {
   return dispatch => {
     dispatch(showLoader(true))
-    adminApi.get("/reloadTags").then(() => {
+    adminApi.get("reloadTags").then(() => {
       console.log("reloaded tags?")
       dispatch(showLoader(false))
     }).catch(err => {
@@ -140,7 +146,7 @@ export const reloadTags = () => {
 export const reloadFiles = () => {
   return dispatch => {
     dispatch(showLoader(true))
-    adminApi.get("/reloadFromFiles").then(() => {
+    adminApi.get("reloadFromFiles").then(() => {
       console.log("reloaded!")
       dispatch(showLoader(false))
     }).catch(err => {

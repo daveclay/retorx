@@ -87,8 +87,7 @@ const PropertiesEditor = ({
   return (
     <span>
       { stupidWeirdMapBecauseICantMap }
-      <br/>
-      <Button onClick={onAddProperty}>Add</Button>
+      <Button onClick={onAddProperty}>Add Property</Button>
     </span>
   )
 }

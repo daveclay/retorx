@@ -25,8 +25,9 @@ const store = createStore(
     applyMiddleware(thunkMiddleware),
   )
 )
-store.dispatch(loadImagesForTag(InitialState.get("initialTag")))
+
 store.dispatch(loadAllTags())
+store.dispatch(loadImagesForTag(InitialState.get("initialTag")))
 
 if (typeof document !== 'undefined') {
   render(

@@ -13,7 +13,8 @@ const mapStateToProps = (state) => {
   return {
     tag,
     tagInfo: state.get("tagInfo").get(tag),
-    images: state.get("imagesByTag").get(tag)
+    images: state.get("imagesByTag").get(tag),
+    initialImage: state.get("initialImage"),
   }
 }
 

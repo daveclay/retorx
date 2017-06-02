@@ -5,8 +5,15 @@ import {
   loadAllTags,
 } from "./actions/imageApiActions"
 
+import {
+  parseHash
+} from "./lib/hash"
+
+const linkedImageData = parseHash()
+
 export default fromJS({
-  initialTag: "figure painting",
+  initialTag: (linkedImageData && linkedImageData.tag) || "figure painting",
+  initialImage: (linkedImageData && linkedImageData.imageId) || null,
   tags: [],
   imagesByTag: {},
   loader: {

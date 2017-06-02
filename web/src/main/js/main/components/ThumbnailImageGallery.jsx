@@ -40,7 +40,7 @@ const renderCaption = (image) => {
 }
 
 class ShareButtonHandler {
-  constructor(images) {
+  setImages(images) {
     this.images = images
   }
 
@@ -66,74 +66,115 @@ class ShareButtonHandler {
   }
 }
 
-const ThumbnailImageGallery = ({
-  tag,
-  tagInfo,
-  images
-}) => {
-
-  let shareButtonHandler = new ShareButtonHandler(images)
-
-  if (!tag) {
-    return <span/>
-  }
-
-  let options = {
-    galleryPIDs: true,
-    galleryUID: tag,
-    showHideOpacity: true,
-    getThumbBoundsFn: getThumbBoundsFn,
-    getImageURLForShare: function( shareButtonData ) {
-      return shareButtonHandler.getImageURLForShare(shareButtonData)
-    },
-    getPageURLForShare: function( shareButtonData ) {
-      return shareButtonHandler.getPageURLForShare(shareButtonData)
-    },
-    getTextForShare: function( shareButtonData ) {
-      return shareButtonHandler.getTextForShare(shareButtonData)
-    },
-
-  };
-
-  let getThumbnailContent = (imageGalleryItem) => {
-    return (
-      <img src={imageGalleryItem.thumbnail} />
-    );
-  }
-
-  let items = images.map(image => {
-    let scaledImageFile = image.get("imageFilesByVersion").get("scaled")
-    return {
-      src: src(image, "scaled"),
-      thumbnail: src(image, "thumbnail"),
-      w: scaledImageFile.get("width"),
-      h: scaledImageFile.get("height"),
-      title: renderCaption(image),
-      pid: image.get("name")
+class ThumbnailImageGallery extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      initialImage: this.props.initialImage,
     }
-  })
-
-  let reactTagInfo = {
-    __html: tagInfo
+    this.shareButtonHandler = new ShareButtonHandler()
   }
 
-  let onChange = (photoSwipe) => {
-    shareButtonHandler.setCurrentImage(photoSwipe.getCurrentIndex())
+  componentWillUpdate(nextProps) {
+    this.shareButtonHandler.setImages(nextProps.images)
   }
 
-  let tagInfoElement = tagInfo ? <div id="tag-text" dangerouslySetInnerHTML={reactTagInfo}/> : null
-
-  return (
-    <div id="gallery" className="col-xs-12 col-sm-9 col-md-10">
-      {
-        tagInfoElement
+  componentDidUpdate() {
+    if (this.props.images) {
+      if (this.state.initialImage) {
+        this.photoswipeGallery.setState({
+          isOpen: true,
+          options: this.buildOptions()
+        })
+        this.setState({
+          initialImage: null,
+        })
+      } else if (this.opened) {
+        this.photoswipeGallery.setState({
+          options: this.buildOptions()
+        })
       }
-      <PhotoSwipeGallery items={items.toJS()}
-                         options={options}
-                         beforeChange={onChange}
-                         thumbnailContent={getThumbnailContent}/>
-    </div>
-  )
+    }
+  }
+
+  buildOptions() {
+    let options = {
+      galleryPIDs: true,
+      galleryUID: this.props.tag,
+      showHideOpacity: true,
+      getThumbBoundsFn: getThumbBoundsFn,
+      getImageURLForShare: (shareButtonData) => {
+        return this.shareButtonHandler.getImageURLForShare(shareButtonData)
+      },
+      getPageURLForShare: (shareButtonData) => {
+        return this.shareButtonHandler.getPageURLForShare(shareButtonData)
+      },
+      getTextForShare: (shareButtonData) => {
+        return this.shareButtonHandler.getTextForShare(shareButtonData)
+      },
+    };
+
+    let index = this.findInitialImageIndex()
+    if (index) {
+      options.index = index
+    }
+
+    return options
+  }
+
+  findInitialImageIndex() {
+    if (this.state.initialImage && this.props.images) {
+      return this.props.images.findIndex(image => image.get("name") == this.state.initialImage)
+    }
+  }
+
+  render() {
+    if (!this.props.tag) {
+      return <span/>
+    }
+
+    let getThumbnailContent = (imageGalleryItem) => {
+      return (
+        <img src={imageGalleryItem.thumbnail}/>
+      );
+    }
+
+    let items = this.props.images.map(image => {
+      let scaledImageFile = image.get("imageFilesByVersion").get("scaled")
+      return {
+        src: src(image, "scaled"),
+        thumbnail: src(image, "thumbnail"),
+        w: scaledImageFile.get("width"),
+        h: scaledImageFile.get("height"),
+        title: renderCaption(image),
+        pid: image.get("name")
+      }
+    })
+
+    let reactTagInfo = {
+      __html: this.props.tagInfo
+    }
+
+    let onChange = (photoSwipe) => {
+      this.shareButtonHandler.setCurrentImage(photoSwipe.getCurrentIndex())
+      this.opened = true
+    }
+
+    let tagInfoElement = this.props.tagInfo ? <div id="tag-text" dangerouslySetInnerHTML={reactTagInfo}/> : null
+
+    return (
+      <div id="gallery" className="col-xs-12 col-sm-9 col-md-10">
+        {
+          tagInfoElement
+        }
+        <PhotoSwipeGallery ref={(photoswipeGallery) => this.photoswipeGallery = photoswipeGallery}
+                           items={items.toJS()}
+                           options={this.buildOptions()}
+                           beforeChange={onChange}
+                           thumbnailContent={getThumbnailContent}/>
+      </div>
+    )
+  }
 }
 
 export default ThumbnailImageGallery

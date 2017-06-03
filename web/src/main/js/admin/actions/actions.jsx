@@ -80,7 +80,7 @@ export const saveImage = (image, editorProperties, files) => {
         file.name;
     })
 
-    let name = image ? image.get("name") : filename
+    let name = image != null ? image.get("name") : filename
 
     dispatch(showLoader(true, `Saving ${name}`))
 
@@ -109,8 +109,9 @@ export const saveImage = (image, editorProperties, files) => {
 
 const saveImageData = (name, image, editorProperties, formData = new FormData()) => {
   addEditorPropertiesToFormData(editorProperties, formData)
+  let method = image != null ? "PUT" : "POST"
   return adminApi.send({
-    method: image ? "PUT" : "POST",
+    method: method,
     path: `image/${name}`,
     headers: {},
     data: formData

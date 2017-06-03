@@ -116,7 +116,8 @@ class Selection extends React.Component {
         touchFiredDoubleClick: true
       })
       setTimeout(() => {
-        this.clearSelection()
+        this.selectedChildren = {};
+        this.forceUpdate();
       }, 300)
     }
   }

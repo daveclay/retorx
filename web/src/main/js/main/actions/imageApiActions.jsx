@@ -2,6 +2,7 @@ import { fromJS } from 'immutable'
 
 import { jsonApiFor } from "../../lib/api"
 import { baseImageContentServicePathBuilder } from "../../lib/paths"
+import { createImage } from "../../lib/imageData"
 
 const imageApi = jsonApiFor(baseImageContentServicePathBuilder)
 
@@ -24,7 +25,7 @@ export const loadImagesForTag = (tag) => {
   return dispatch => {
     imageApi.get("tag/" + tag)
       .then(images => {
-        return fromJS(images)
+        return fromJS(images).map(image => createImage(image))
       }).then(images => {
         dispatch(imagesLoaded(tag, images))
       })

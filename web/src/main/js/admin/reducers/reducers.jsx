@@ -12,6 +12,7 @@ import {
   upsertEditorPropertyName,
   upsertEditorPropertyValue,
 } from "../lib/properties"
+import { createImage } from "../../lib/imageData"
 
 const showLoader = (state, action) => {
   return state.set("loader", Immutable.Map({
@@ -99,10 +100,10 @@ const imagesLoaded = (state, action) => {
 }
 
 const imageLoaded = (state, action) => {
-  let updatedImage = action.image;
-  let upsertFunc = upserter(findById(updatedImage.get("id")), existingImage => updatedImage)
+  let loadedImage = createImage(action.image)
+  let upsertFunc = upserter(findById(loadedImage.get("id")), existingImage => loadedImage)
 
-  let imageTag = updatedImage.get("tags").get(0)
+  let imageTag = loadedImage.get("tags").get(0)
   let currentImagesByTag = state.get("imagesByTag")
   let currentImagesForTag = currentImagesByTag.get(imageTag)
 

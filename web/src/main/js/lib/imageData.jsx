@@ -11,3 +11,7 @@ export const dateText = (image) => {
   let date = moment(milliseconds);
   return date.format("MMM YYYY");
 }
+
+export const createImage = (image) => {
+  return image.set("loadedAt", new Date().getTime())
+}

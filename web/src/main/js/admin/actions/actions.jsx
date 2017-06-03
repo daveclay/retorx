@@ -49,11 +49,6 @@ export const imageFilesSelected = (files) => {
   }
 }
 
-export const addImage = (files) => {
-  return dispatch => {
-  }
-}
-
 export const initialize = () => {
   return {
     type: "INITIALIZE"
@@ -71,21 +66,14 @@ export const closeMultipleImageEditor = () => {
   }
 }
 
-export const menuItemSelected = (menuItem) => {
-  return {
-    type: "MENU_ITEM_SELECTED",
-    menuItem
-  }
-}
-
-export const saveImage = (image, editorProperties, files = null) => {
-  const withFile = (f) => {
-    if (files && files.length > 0) {
-      return f(files[0])
-    }
-  }
-
+export const saveImage = (image, editorProperties, files) => {
   return dispatch => {
+    const withFile = (f) => {
+      if (files && files.length > 0) {
+        return f(files[0])
+      }
+    }
+
     let filename = withFile(file => {
       return file.name.indexOf(".") > -1 ?
         file.name.substring(0, file.name.lastIndexOf('.')) :

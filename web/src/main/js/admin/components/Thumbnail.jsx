@@ -18,7 +18,7 @@ class Thumbnail extends React.Component {
     let className = `${fadeClassName}${hiddenClassName}`
 
     let thumbnail = image.get("imageFilesByVersion").get("thumbnail")
-    let src = baseImageContentServicePathBuilder("image/thumbnail/" + image.get("name") + ".png") + "?t=" + new Date().getTime()
+    let src = baseImageContentServicePathBuilder(`image/thumbnail/${image.get("name")}.png`) + `?t=${image.get("loadedAt")}`
 
     return (
       <div className="thumbnail">

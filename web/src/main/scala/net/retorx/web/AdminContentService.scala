@@ -83,28 +83,35 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 	@Produces(Array("text/json"))
 	def replaceImageFile(@PathParam("name") name: String,
 						 formDataInput: MultipartFormDataInput) = {
-		withImageContent(name) { imageContent =>
-			val onPropertiesUploaded = (properties: Map[String, String]) => {
-				imageContent.setProperties(properties)
-				imageContent.savePropertiesFile()
-			}
-
-			val onFileUploaded = (inputStream: InputStream) => {
-				imageContent.getImageFileByVersion("original") match {
-					case Some(imageFile) =>
-						IOUtils.copy(inputStream, new FileOutputStream(imageFile.file))
-						imageContentDAO.replaceOriginalImage(imageContent)
-					case None =>
-						throw new NotFoundException("Somehow don't have an original file.")
-
+		try {
+			withImageContent(name) { imageContent =>
+				val onPropertiesUploaded = (properties: Map[String, String]) => {
+					imageContent.setProperties(properties)
+					imageContent.savePropertiesFile()
 				}
+
+				val onFileUploaded = (inputStream: InputStream) => {
+					imageContent.getImageFileByVersion("original") match {
+						case Some(imageFile) =>
+							IOUtils.copy(inputStream, new FileOutputStream(imageFile.file))
+							imageContentDAO.replaceOriginalImage(imageContent)
+						case None =>
+							throw new NotFoundException("Somehow don't have an original file.")
+
+					}
+				}
+
+				handleProperties(formDataInput, onPropertiesUploaded)
+				handleFileUpload(formDataInput, onFileUploaded)
+				imageContentDAO.reloadFromFiles()
+
+				imageContent
 			}
+		} catch {
+			case err: Exception =>
+				err.printStackTrace()
+				unprocessableEntity(err.getMessage)
 
-			handleProperties(formDataInput, onPropertiesUploaded)
-			handleFileUpload(formDataInput, onFileUploaded)
-			imageContentDAO.reloadFromFiles()
-
-			imageContent
 		}
 	}
 
@@ -132,12 +139,13 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 				handleProperties(formDataInput, onPropertiesUploaded)
 				handleFileUpload(formDataInput, onFileUploaded)
 
-
 				for {
 					properties <- propertiesPromise.future.value.get
 					inputStream <- filePromise.future.value.get
 				} yield {
+					println(s"adding new image ${name}")
 					imagesDirectoryManager.addImage(name, properties, inputStream)
+					println("reloading image files")
 					imageContentDAO.reloadFromFiles()
 				}
 
@@ -162,6 +170,7 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 				val inputStream = imageInputPart.getBody(classOf[InputStream], null)
 				onFileUploaded(inputStream)
 			case None =>
+				println("No file provided.")
 		}
 	}
 

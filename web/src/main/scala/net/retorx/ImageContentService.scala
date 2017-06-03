@@ -67,7 +67,7 @@ class ImageContentService @Inject() (val imageContentDAO:ImageContentDAO) extend
 		withImageContent(name) { imageContent =>
 			imageContent.getImageFileByVersion(version) match {
 				case Some(imageFile) => imageFile.file
-				case None => None
+				case None => throw new NotFoundException()
 			}
 		}
     }

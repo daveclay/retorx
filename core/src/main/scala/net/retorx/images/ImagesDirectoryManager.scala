@@ -49,14 +49,27 @@ class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 	}
 
 	def addImage(name: String, properties: Map[String, String], inputStream: InputStream) {
-		val imageDirectory = new File(imagesDir, name)
-		if (imageDirectory.exists()) {
-			throw new IllegalStateException(s"Directory ${imageDirectory} exists")
+		try {
+			val imageDirectory = new File(imagesDir, name)
+			if (imageDirectory.exists()) {
+				println(s"Directory ${imageDirectory.getAbsolutePath} exists")
+				throw new IllegalStateException(s"Directory ${imageDirectory} exists")
+			}
+			if (imageDirectory.mkdirs()) {
+				val file = new File(imageDirectory, name + ".png")
+				IOUtils.copy(inputStream, new FileOutputStream(file))
+				println(s"Added image ${file.getAbsolutePath}")
+				val propertiesFile = PropertiesUtils.findPropertiesFile(imageDirectory)
+				PropertiesUtils.writeProperties(properties, propertiesFile)
+			} else {
+				throw new IllegalStateException(s"Could not create directories to ${imageDirectory}")
+			}
+		} catch {
+			case e: Exception =>
+				println(s"Couldn't add $name: ${e.getMessage}")
+				e.printStackTrace()
+				throw e
 		}
-		imageDirectory.mkdirs()
-		IOUtils.copy(inputStream, new FileOutputStream(new File(imageDirectory, name + ".png")))
-		val propertiesFile = PropertiesUtils.findPropertiesFile(imageDirectory)
-		PropertiesUtils.writeProperties(properties, propertiesFile)
 	}
 
 	def deleteImageFile(imageFile: ImageFile) {

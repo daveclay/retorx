@@ -3,13 +3,14 @@ package net.retorx.jai
 import java.io.File
 import java.awt.image.renderable.ParameterBlock
 import java.awt.color.ColorSpace
-import java.awt.image.{BufferedImageFilter, ColorConvertOp, BufferedImage}
-import java.awt.{GraphicsEnvironment, GraphicsDevice, RenderingHints}
+import java.awt.image.{BufferedImage, BufferedImageFilter, ColorConvertOp}
+import java.awt.{GraphicsDevice, GraphicsEnvironment, RenderingHints}
 import javax.media.jai.operator.ScaleDescriptor
-import javax.media.jai.{InterpolationBicubic, BorderExtender, JAI}
+import javax.media.jai.{BorderExtender, InterpolationBicubic, JAI}
 import java.util.Random
+import javax.imageio.ImageIO
+
 import com.google.inject.{Inject, Singleton}
-import net.retorx.util.FileUtil
 
 @Singleton
 class ImageUtil {
@@ -66,7 +67,7 @@ class ImageUtil {
 		val op = ScaleDescriptor.create(image, scale, scale, 0.toFloat, 0.toFloat, new InterpolationBicubic(0xf), hints)
 		val scaledImage = op.getAsBufferedImage
 
-		(scaledImage)
+		scaledImage
 	}
 
 	private def calculateScaleFactor(widthFactor: Float, heightFactor: Float): Float = {
@@ -94,13 +95,7 @@ class ImageUtil {
 	}
 
 	def savePNGImageFile(file: File, image: BufferedImage) = {
-		val format = "png"
-		val parameterBlock = new ParameterBlock()
-		parameterBlock.addSource(image)
-		parameterBlock.add(file.getAbsolutePath)
-		parameterBlock.add(format)
-
-		JAI.create("filestore", parameterBlock)
+		ImageIO.write(image, "png", file)
 	}
 
 	def desaturateImage(renderedImage: BufferedImage) = {
@@ -110,7 +105,7 @@ class ImageUtil {
 
 	def createBufferedImage(file: File) = {
 		try {
-			JAI.create("fileload", file.getAbsolutePath).getAsBufferedImage
+			ImageIO.read(file)
 		} catch {
 			case e: Exception =>
 				throw new IllegalArgumentException("Could not create a buffered image for file " + file, e)

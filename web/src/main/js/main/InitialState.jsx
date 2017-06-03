@@ -6,10 +6,10 @@ import {
 } from "./actions/imageApiActions"
 
 import {
-  parseHash
+  parseRequest
 } from "./lib/hash"
 
-const linkedImageData = parseHash()
+const linkedImageData = parseRequest()
 
 export default fromJS({
   initialTag: (linkedImageData && linkedImageData.tag) || "figure painting",

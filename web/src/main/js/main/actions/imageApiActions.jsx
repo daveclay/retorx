@@ -21,6 +21,12 @@ export const loadAllTags = () => {
   }
 };
 
+const hideLoader = () => {
+  let body = document.getElementsByTagName("body")[0]
+  let loaderElement = document.getElementsByClassName("loader-overlay-show")[0]
+  body.removeChild(loaderElement)
+}
+
 export const loadImagesForTag = (tag) => {
   return dispatch => {
     imageApi.get("tag/" + tag)
@@ -28,6 +34,7 @@ export const loadImagesForTag = (tag) => {
         return fromJS(images).map(image => createImage(image))
       }).then(images => {
         dispatch(imagesLoaded(tag, images))
+        hideLoader()
       })
   }
 };

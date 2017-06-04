@@ -7,7 +7,7 @@ import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware, compose } from 'redux'
 import { initialize } from "./actions/actions"
-import { loadAllTags } from "../main/actions/imageApiActions"
+import { loadAllTags } from "./actions/actions"
 import reducers from './reducers/reducers'
 import App from './containers/App'
 import InitialState from './InitialState'

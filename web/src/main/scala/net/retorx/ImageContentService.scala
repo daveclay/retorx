@@ -11,7 +11,7 @@ import net.retorx.web.ContentService
 @Path("/images")
 class ImageContentService @Inject() (val imageContentDAO:ImageContentDAO) extends ContentService {
 
-    @NoCache
+	@NoCache
 	@GET
 	@Path("/tags")
 	@Produces(Array("text/json"))

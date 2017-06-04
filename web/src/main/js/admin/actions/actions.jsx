@@ -3,7 +3,8 @@ import Immutable from "immutable"
 import { jsonApiFor } from "../../lib/api"
 import { baseAdminContentServicePathBuilder } from "../../lib/paths"
 import {
-  imageLoaded
+  imageLoaded,
+  tagsLoaded
 } from "../../main/actions/imageApiActions"
 
 const handleJSONError = (err) => {
@@ -65,6 +66,15 @@ export const closeMultipleImageEditor = () => {
     type: "CLOSE_MULTIPLE_IMAGE_EDITOR"
   }
 }
+
+export const loadAllTags = () => {
+  return dispatch => {
+    adminApi.get("tags")
+      .then((tags) => {
+        dispatch(tagsLoaded(Immutable.fromJS(tags)))
+      })
+  }
+};
 
 export const saveImage = (image, editorProperties, files) => {
   return dispatch => {

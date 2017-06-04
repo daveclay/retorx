@@ -28,7 +28,7 @@ class Tag extends React.Component {
 
   render = () => {
     return (
-      <Row>
+      <Row className="admin-images">
         <Col xs={12}>
           <Selection tag={this.props.tag}
                      onSelectionChange={this.props.onImagesSelected}

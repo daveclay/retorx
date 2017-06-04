@@ -2,7 +2,7 @@ import { fromJS } from 'immutable'
 
 import {
   loadImagesForTag,
-  loadAllTags,
+  loadTags,
 } from "./actions/imageApiActions"
 
 import {

@@ -12,7 +12,7 @@ export const showAbout = () => {
   }
 }
 
-export const loadAllTags = () => {
+export const loadTags = () => {
   return dispatch => {
     imageApi.get("tags")
       .then((tags) => {

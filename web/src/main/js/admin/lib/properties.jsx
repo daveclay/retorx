@@ -57,12 +57,22 @@ export const buildEditorProperties = (imageProperties) => {
   })
 }
 
-export const addEditorPropertiesToFormData = (editorProperties, formData) => {
+export const assignMaps = (source, ...targets) => {
+  let collectedTargets = targets.reduce((result, source) => {
+    return Object.assign(result, source.toJS())
+  }, {})
+  return Immutable.fromJS(Object.assign(source.toJS(), collectedTargets))
+}
+
+export const editorPropertiesToMap = (editorProperties) => {
   let properties = {}
   editorProperties.forEach(editorProperty => {
     properties[editorProperty.get("name")] = editorProperty.get("value")
   })
-  let blob = new Blob([JSON.stringify(properties, null, 2)], { type : 'application/json' })
-  formData.append("properties", blob)
+  return Immutable.fromJS(properties)
 }
 
+export const addMapToFormData = (map, formData) => {
+  let blob = new Blob([JSON.stringify(map.toJS(), null, 2)], { type : 'application/json' })
+  formData.append("properties", blob)
+}

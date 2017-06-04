@@ -7,6 +7,15 @@ import {
   tagsLoaded
 } from "../../main/actions/imageApiActions"
 
+import {
+  buildEditorProperties,
+  assignMaps,
+  editorPropertiesToMap,
+  addMapToFormData
+} from "../lib/properties"
+
+const adminApi = jsonApiFor(baseAdminContentServicePathBuilder)
+
 const handleJSONError = (err) => {
   console.error(err)
   if (err.message) {
@@ -17,12 +26,6 @@ const handleJSONError = (err) => {
     alert(err)
   }
 }
-
-const adminApi = jsonApiFor(baseAdminContentServicePathBuilder)
-import {
-  buildEditorProperties,
-  addEditorPropertiesToFormData
-} from "../lib/properties"
 
 export const tagSelected = (tag) => {
   return {
@@ -100,9 +103,9 @@ export const saveImage = (image, editorProperties, files) => {
       formData.append("image", file)
     })
 
-    addEditorPropertiesToFormData(editorProperties, formData)
+    let propertiesMap = editorPropertiesToMap(editorProperties)
 
-    saveImageData(name, image, editorProperties, formData)
+    saveImageData(name, image, propertiesMap, formData)
       .then(savedPojoImage => {
         return Immutable.fromJS(savedPojoImage)
       }).then(savedImage => {
@@ -117,8 +120,8 @@ export const saveImage = (image, editorProperties, files) => {
   }
 }
 
-const saveImageData = (name, image, editorProperties, formData = new FormData()) => {
-  addEditorPropertiesToFormData(editorProperties, formData)
+const saveImageData = (name, image, properties, formData = new FormData()) => {
+  addMapToFormData(properties, formData)
   let method = image != null ? "PUT" : "POST"
   return adminApi.send({
     method: method,
@@ -166,7 +169,12 @@ export const saveMultipleImageProperties = (images, editorProperties) => {
 
       let imageProperties = image.get("properties")
       let existingEditorProperties = buildEditorProperties(imageProperties)
-      return saveImageData(name, image, existingEditorProperties.merge(editorProperties)).then(() => {
+
+      let exitingProperties = editorPropertiesToMap(existingEditorProperties)
+      let updatedProperties = editorPropertiesToMap(editorProperties)
+      let mergedProperties = assignMaps(exitingProperties, updatedProperties)
+
+      return saveImageData(name, image, mergedProperties).then(() => {
         count++;
         dispatch(showLoader(true, `Saved ${name} - ${count} of ${total}`))
       })

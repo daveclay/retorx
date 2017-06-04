@@ -2,17 +2,12 @@ import Immutable from "immutable"
 
 import { chainReducers, map } from '../../lib/chainReducers'
 import {
-  upserter,
-  findById
-} from "../../lib/immutableUtils"
-import {
   setImageEditorProperties,
   upsertImageEditorPropertyById,
   deleteImageEditorPropertyById,
   upsertEditorPropertyName,
   upsertEditorPropertyValue,
 } from "../lib/properties"
-import { createImage } from "../../lib/imageData"
 
 const showLoader = (state, action) => {
   return state.set("loader", Immutable.Map({
@@ -100,17 +95,7 @@ const imagesLoaded = (state, action) => {
 }
 
 const imageLoaded = (state, action) => {
-  let loadedImage = createImage(action.image)
-  let upsertFunc = upserter(findById(loadedImage.get("id")), existingImage => loadedImage)
-
-  let imageTag = loadedImage.get("tags").get(0)
-  let currentImagesByTag = state.get("imagesByTag")
-  let currentImagesForTag = currentImagesByTag.get(imageTag)
-
-  let updatedImagesForTag = upsertFunc(currentImagesForTag)
-  let updatedImagesByTag = currentImagesByTag.set(imageTag, updatedImagesForTag)
-
-  return state.set("imagesByTag", updatedImagesByTag)
+  return state.set("imagesByTag", Immutable.Map())
 }
 
 const closeMultipleImageEditor = (state) => {
@@ -122,7 +107,7 @@ const closeSingleImageEditor = (state) => {
 }
 
 const tagsReloaded = (state, action) => {
-  return state
+  return state.set("imagesByTag", Immutable.Map())
 }
 
 export default chainReducers(

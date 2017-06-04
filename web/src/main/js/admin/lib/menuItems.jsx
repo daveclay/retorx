@@ -1,25 +1,20 @@
 import {
   reloadTags,
   reloadFiles,
-  editSelected,
   openAddImage
 } from "../actions/actions"
 
 export const menuItems = [
   {
-    name: "reload tags",
-    action: reloadTags
-  },
-  {
-    name: "reload files",
-    action: reloadFiles
-  },
-  {
-    name: "Add",
+    name: "Add New Image",
     action: openAddImage
   },
   {
-    name: "Edit",
-    action: editSelected
+    name: "Reload Tags",
+    action: reloadTags
+  },
+  {
+    name: "Reload Files",
+    action: reloadFiles
   },
 ];

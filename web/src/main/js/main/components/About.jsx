@@ -5,7 +5,7 @@ const About = () => {
     <div id="about" style={{display: "block"}}
          className="col-xs-12 col-sm-9 col-md-10">
       <div className="about-img-container">
-        <img className="about-img" src="./images/me.jpg"/>
+        <img className="about-img" src="./css/images/me.jpg"/>
       </div>
       <div id="about-text"><p>
         Dave Clay is a figure artist, software engineer, interactive sculptor using Arduino and LEDs, and musician. He has exhibited at the Seattle Erotic Art Festival as well as an Honorarium Grant Receiver for Burning Man.

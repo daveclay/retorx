@@ -213,6 +213,7 @@ a:hover {
 }
 
 #about {
+    padding-top: 65px;
     margin: 0 auto;
     vertical-align: top;
     text-align: left;

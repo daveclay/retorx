@@ -19,9 +19,10 @@ const showLoader = (state, action) => {
 
 const imagesLoaded = (state, action) => {
   let imagesByTag = state.get("imagesByTag")
+  let visibleImages = action.images.filterNot(image => image.get("hidden"))
   return state.set("showAbout", false)
     .set("currentTag", action.tag)
-    .set("imagesByTag", imagesByTag.set(action.tag, action.images))
+    .set("imagesByTag", imagesByTag.set(action.tag, visibleImages))
 }
 
 export default chainReducers(

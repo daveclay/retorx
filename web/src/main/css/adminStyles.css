@@ -10,6 +10,47 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+.select-box {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+}
+
+/* dragged selection box */
+.selection-border {
+    background: rgba(0, 162, 255, 0.2);
+    position: fixed;
+    z-index: 99;
+    border: 1px dashed grey;
+}
+
+.selection .select-box.selected .thumbnail {
+    background: #b5d8f6;
+}
+
+.thumbnail {
+    display: inline-block;
+    width: 180px;
+    border: 1px solid lightgray;
+    margin: 2px;
+    text-align: center;
+}
+
+.fadeIn {
+    transition: opacity .55s ease-in-out;
+    -moz-transition: opacity .55s ease-in-out;
+    -webkit-transition: opacity .55s ease-in-out;
+}
+
+.transparent {
+    opacity: 0;
+}
+
+.hidden-image {
+    opacity: .3;
+    background-color: #999da8;
+}
+
 .admin-images {
     padding-top: 60px;
 }

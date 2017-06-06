@@ -14,14 +14,14 @@ class Thumbnail extends React.Component {
      let image = this.props.image;
 
     let hiddenClassName = image.get("properties").get("hidden") ? " hidden-image" : ""
-    let fadeClassName = this.state.loaded ? "fadeIn " : "transparent "
-    let className = `${fadeClassName}${hiddenClassName}`
+    let fadeClassName = this.state.loaded ? "fadeIn" : "transparent"
+    let className = `${fadeClassName}`
 
     let thumbnail = image.get("imageFilesByVersion").get("thumbnail")
     let src = baseImageContentServicePathBuilder(`image/thumbnail/${image.get("name")}.png`) + `?t=${image.get("loadedAt")}`
 
     return (
-      <div className="thumbnail">
+      <div className={`thumbnail${hiddenClassName}`}>
         <img className={className}
              onLoad={ () => this.setState({ loaded: true }) }
              width="100"

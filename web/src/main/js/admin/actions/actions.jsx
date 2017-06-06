@@ -3,7 +3,7 @@ import Immutable from "immutable"
 import { jsonApiFor } from "../../lib/api"
 import { baseAdminContentServicePathBuilder } from "../../lib/paths"
 import {
-  imageLoaded,
+  imagesSaved,
   tagsLoaded
 } from "../../main/actions/imageApiActions"
 
@@ -79,6 +79,19 @@ export const loadAllTags = () => {
   }
 };
 
+export const reload = () => {
+  return dispatch => {
+    dispatch(showLoader(true))
+    adminApi.post({ path: "reload"}).then(() => {
+      dispatch(showLoader(false))
+    }).catch(err => {
+      handleJSONError(err)
+    }).then(() => {
+      dispatch(showLoader(false))
+    })
+  }
+}
+
 export const saveImage = (image, editorProperties, files) => {
   return dispatch => {
     const withFile = (f) => {
@@ -106,55 +119,15 @@ export const saveImage = (image, editorProperties, files) => {
     let propertiesMap = editorPropertiesToMap(editorProperties)
 
     saveImageData(name, image, propertiesMap, formData)
-      .then(savedPojoImage => {
-        return Immutable.fromJS(savedPojoImage)
-      }).then(savedImage => {
-      console.log(`saved image ${savedImage.get("name")}`);
-      dispatch(closeSingleImageEditor())
-      dispatch(imageLoaded(savedImage))
-    }).catch(err => {
-      handleJSONError(err)
-    }).then(() => {
-      dispatch(showLoader(false))
-    })
-  }
-}
-
-const saveImageData = (name, image, properties, formData = new FormData()) => {
-  addMapToFormData(properties, formData)
-  let method = image != null ? "PUT" : "POST"
-  return adminApi.send({
-    method: method,
-    path: `image/${name}`,
-    headers: {},
-    data: formData
-  })
-}
-
-export const reloadTags = () => {
-  return dispatch => {
-    dispatch(showLoader(true))
-    adminApi.get("reloadTags").then(() => {
-      console.log("reloaded tags?")
-      dispatch(showLoader(false))
-    }).catch(err => {
-      handleJSONError(err)
-    }).then(() => {
-      dispatch(showLoader(false))
-    })
-  }
-}
-
-export const reloadFiles = () => {
-  return dispatch => {
-    dispatch(showLoader(true))
-    adminApi.get("reloadFromFiles").then(() => {
-      console.log("reloaded!")
-      dispatch(showLoader(false))
-    }).catch(err => {
-      handleJSONError(err)
-    }).then(() => {
-      dispatch(showLoader(false))
+      .then(() => {
+        adminApi.post({ path: "reload"}).then(() => {
+          dispatch(closeSingleImageEditor())
+          dispatch(imagesSaved())
+        }).catch(err => {
+          handleJSONError(err)
+        }).then(() => {
+          dispatch(showLoader(false))
+        })
     })
   }
 }
@@ -180,14 +153,30 @@ export const saveMultipleImageProperties = (images, editorProperties) => {
       })
     })
     Promise.all(promises).then(() => {
-      dispatch(closeMultipleImageEditor())
-      dispatch(showLoader(false))
+      adminApi.post({path: "reload"}).then(() => {
+        dispatch(closeMultipleImageEditor())
+      }).then(() => {
+        dispatch(imagesSaved())
+      }).catch(err => {
+        handleJSONError(err)
+      })
     }).catch(err => {
       handleJSONError(err)
     }).then(() => {
       dispatch(showLoader(false))
     })
   }
+}
+
+const saveImageData = (name, image, properties, formData = new FormData()) => {
+  addMapToFormData(properties, formData)
+  let method = image != null ? "PUT" : "POST"
+  return adminApi.send({
+    method: method,
+    path: `image/${name}`,
+    headers: {},
+    data: formData
+  })
 }
 
 export const addImageProperty = () => {

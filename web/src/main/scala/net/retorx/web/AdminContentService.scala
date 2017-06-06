@@ -6,26 +6,21 @@ import com.google.inject.{Inject, Singleton}
 import net.retorx.images.{ImageContentDAO, ImagesDirectoryManager}
 import net.retorx.config.SiteContentService
 import org.jboss.resteasy.spi.NotFoundException
-import org.jboss.resteasy.plugins.providers.multipart.{InputPart, MultipartFormDataInput}
-import org.apache.commons.io.IOUtils
-import java.io.{File, FileOutputStream, InputStream}
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput
+import java.io.InputStream
 import javax.ws.rs.core.Response
-import javax.ws.rs.core.Response.ResponseBuilder
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.jboss.resteasy.annotations.cache.NoCache
-
-import scala.concurrent.Promise
 
 @Path("/admin")
 @Singleton
 class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 									imagesDirectoryManager: ImagesDirectoryManager,
-									siteContentService: SiteContentService) extends ContentService {
+									siteContentService: SiteContentService,
+									updateImageContentHelper: UpdateImageContentHelper) extends ContentService {
 
-	val multipartHandler = new MultipartHandler()
+	private val uploadImageContentHandler = new UploadImageFormDataHelper()
+	private val imageUpdater = updateImageContentHelper.imageUpdater()
 
 	def successJson = """{"success":true}"""
 
@@ -44,22 +39,6 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 	def renameTag(@PathParam("tag") existingTag: String, newTag: String) = {
 		imageContentDAO.renameTag(existingTag.trim(), newTag.trim())
 		successJson
-	}
-
-	@POST
-	@Path("/image/{name}/properties")
-	@Consumes(Array("text/json", "application/json", "application/vnd.imageContent+json"))
-	@Produces(Array("application/vnd.imageContent+json"))
-	def saveProperties(@PathParam("name") name: String, properties: java.util.Map[String, String]) = {
-		withImageContent(name) { imageContent =>
-			val wrapped = scala.collection.JavaConversions.mapAsScalaMap(properties)
-			imageContent.setProperties(wrapped.toMap)
-			imageContent.savePropertiesFile()
-			// a little overzealous, but whatever - how long does it take to determine whether tags have changed vs
-			// just reloading the damned tags?
-			imageContentDAO.reloadTags()
-			imageContent
-		}
 	}
 
 	@DELETE
@@ -81,30 +60,16 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 	@Path("/image/{name}")
 	@Consumes(Array("multipart/form-data"))
 	@Produces(Array("text/json"))
-	def replaceImageFile(@PathParam("name") name: String,
-						 formDataInput: MultipartFormDataInput) = {
+	def updateImageFile(@PathParam("name") name: String,
+						formDataInput: MultipartFormDataInput) = {
 		try {
 			withImageContent(name) { imageContent =>
-				val onPropertiesUploaded = (properties: Map[String, String]) => {
-					imageContent.setProperties(properties)
-					imageContent.savePropertiesFile()
+				val handler = (properties: Map[String, String], inputStreamOption: Option[InputStream]) => {
+					println(s"updating image $name")
+					imageUpdater(imageContent, properties, inputStreamOption)
 				}
 
-				val onFileUploaded = (inputStream: InputStream) => {
-					imageContent.getImageFileByVersion("original") match {
-						case Some(imageFile) =>
-							IOUtils.copy(inputStream, new FileOutputStream(imageFile.file))
-							imageContentDAO.replaceOriginalImage(imageContent)
-						case None =>
-							throw new NotFoundException("Somehow don't have an original file.")
-
-					}
-				}
-
-				handleProperties(formDataInput, onPropertiesUploaded)
-				handleFileUpload(formDataInput, onFileUploaded)
-				imageContentDAO.reloadFromFiles()
-
+				uploadImageContentHandler.handleSaveImageData(formDataInput, handler)
 				imageContent
 			}
 		} catch {
@@ -125,70 +90,24 @@ class AdminContentService @Inject()(val imageContentDAO: ImageContentDAO,
 			case Some(imageContent) =>
 				unprocessableEntity("image file " + name + " already exists")
 			case None =>
-				val propertiesPromise = Promise[Map[String, String]]()
-				val filePromise = Promise[InputStream]()
+				uploadImageContentHandler.handleSaveImageData(formDataInput, (properties, inputStreamOption) => {
+					println(s"adding new image $name")
+					inputStreamOption match {
+						case Some(inputStream) =>
+							imagesDirectoryManager.addImage(name, properties, inputStream)
+						case None =>
+							unprocessableEntity("No image file provided")
 
-				val onPropertiesUploaded = (properties: Map[String, String]) => {
-					propertiesPromise.success(properties)
-				}
+					}
+				})
 
-				val onFileUploaded = (inputStream: InputStream) => {
-					filePromise.success(inputStream)
-				}
-
-				handleProperties(formDataInput, onPropertiesUploaded)
-				handleFileUpload(formDataInput, onFileUploaded)
-
-				for {
-					properties <- propertiesPromise.future.value.get
-					inputStream <- filePromise.future.value.get
-				} yield {
-					println(s"adding new image ${name}")
-					imagesDirectoryManager.addImage(name, properties, inputStream)
-					println("reloading image files")
-					imageContentDAO.reloadFromFiles()
-				}
-
-				imageContentDAO.getImageContent(name)
+				successJson
 		}
 	}
 
-	private def handleProperties[T](formDataInput: MultipartFormDataInput,
-									onPropertiesUploaded: (Map[String, String] => T)) = {
-		val propertiesInputPart = getFormDataMap(formDataInput)("properties").get(0)
-		val mapper = new ObjectMapper() with ScalaObjectMapper
-		mapper.registerModule(DefaultScalaModule)
-		val properties = mapper.readValue(propertiesInputPart.getBodyAsString, classOf[Map[String, String]])
-		onPropertiesUploaded(properties)
-	}
-
-	private def handleFileUpload[T](formDataInput: MultipartFormDataInput,
-									onFileUploaded: (InputStream) => T) = {
-		getFormDataMap(formDataInput).get("image") match {
-			case Some(imageInputParts) =>
-				val imageInputPart = imageInputParts.get(0)
-				val inputStream = imageInputPart.getBody(classOf[InputStream], null)
-				onFileUploaded(inputStream)
-			case None =>
-				println("No file provided.")
-		}
-	}
-
-	private def getFormDataMap(formDataInput: MultipartFormDataInput) = {
-		import scala.collection.JavaConverters._
-		formDataInput.getFormDataMap.asScala
-	}
-
-	@GET
-	@Path("/reloadTags")
-	def reloadTags() = {
-		imageContentDAO.reloadTags()
-		successJson
-	}
-
-	@GET
-	@Path("/reloadFromFiles")
-	def reloadFromFiles() = {
+	@POST
+	@Path("/reload")
+	def reload() = {
 		imageContentDAO.reloadFromFiles()
 		successJson
 	}

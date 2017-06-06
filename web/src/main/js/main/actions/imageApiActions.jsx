@@ -24,7 +24,9 @@ export const loadTags = () => {
 const hideLoader = () => {
   let body = document.getElementsByTagName("body")[0]
   let loaderElement = document.getElementsByClassName("loader-overlay-show")[0]
-  body.removeChild(loaderElement)
+  if (loaderElement) {
+    body.removeChild(loaderElement)
+  }
 }
 
 export const loadImagesForTag = (tag) => {
@@ -54,9 +56,8 @@ export const imagesLoaded = (tag, images) => {
   }
 }
 
-export const imageLoaded = (image) => {
+export const imagesSaved = () => {
   return {
-    type: "IMAGE_LOADED",
-    image: image
+    type: "IMAGES_SAVED",
   }
 }

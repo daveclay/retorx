@@ -1,6 +1,5 @@
 import {
-  reloadTags,
-  reloadFiles,
+  reload,
   openAddImage
 } from "../actions/actions"
 
@@ -10,11 +9,7 @@ export const menuItems = [
     action: openAddImage
   },
   {
-    name: "Reload Tags",
-    action: reloadTags
-  },
-  {
     name: "Reload Files",
-    action: reloadFiles
+    action: reload
   },
 ];

@@ -34,10 +34,6 @@ class ImageContentDAO @Inject()(var imageContentLibrary: ImageContentLibrary) {
 		})
 	}
 
-	def reloadTags() {
-		reset()
-	}
-
 	def reloadFromFiles() {
 		reset()
 	}

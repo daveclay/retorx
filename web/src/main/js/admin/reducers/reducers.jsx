@@ -94,7 +94,7 @@ const imagesLoaded = (state, action) => {
   return state.set("imagesByTag", imagesByTag.set(action.tag, action.images))
 }
 
-const imageLoaded = (state, action) => {
+const imagesSaved = (state) => {
   return state.set("imagesByTag", Immutable.Map())
 }
 
@@ -114,7 +114,7 @@ export default chainReducers(
   map("EDIT_SELECTED").to(editSelected),
   map("TAGS_LOADED").to(tagsLoaded),
   map("TAG_SELECTED").to(tagSelected),
-  map("IMAGE_LOADED").to(imageLoaded),
+  map("IMAGES_SAVED").to(imagesSaved),
   map("IMAGES_LOADED").to(imagesLoaded),
   map("IMAGES_SELECTED").to(imagesSelected),
   map("CLOSE_MULTIPLE_IMAGE_EDITOR").to(closeMultipleImageEditor),

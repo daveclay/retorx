@@ -164,6 +164,10 @@ class ThumbnailImageGallery extends React.Component {
     }
 
     let onChange = (photoSwipe) => {
+      // Note: this clears out the gid hash when it's set by clicking on a gallery.
+      if (window.location.hash.indexOf("pid") < 0) {
+        window.location.hash = "";
+      }
       this.shareButtonHandler.setCurrentImage(photoSwipe.getCurrentIndex())
       this.opened = true
     }

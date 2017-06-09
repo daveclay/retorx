@@ -31,6 +31,7 @@ export const loadTags = () => {
 export const loadImagesForTag = (tag) => {
   return dispatch => {
     showLoader("")
+    updateGID(tag)
     imageApi.get("tag/" + tag)
       .then(images => {
         return fromJS(images).map(image => createImage(image))
@@ -63,6 +64,10 @@ export const imagesSaved = () => {
   return {
     type: "IMAGES_SAVED",
   }
+}
+
+const updateGID = (tag) => {
+  window.location.hash = `&gid=${tag}`
 }
 
 const showLoader = (message) => {

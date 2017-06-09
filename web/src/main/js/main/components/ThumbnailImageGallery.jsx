@@ -1,10 +1,6 @@
 import React from 'react'
 
 import {
-  Row,
-} from "react-bootstrap"
-
-import {
   PhotoSwipeGallery
 } from 'react-photoswipe';
 
@@ -97,6 +93,10 @@ class ThumbnailImageGallery extends React.Component {
     }
   }
 
+  imageLoaded(e) {
+    e.target.className = "fadeIn"
+  }
+
   buildOptions() {
     let options = {
       galleryPIDs: true,
@@ -134,9 +134,17 @@ class ThumbnailImageGallery extends React.Component {
     }
 
     let getThumbnailContent = (imageGalleryItem) => {
+      console.log(imageGalleryItem.pid)
       return (
-        <img src={imageGalleryItem.thumbnail}/>
-      );
+        <div className="image-container">
+          <img key={imageGalleryItem.thumbnail}
+               src={imageGalleryItem.thumbnail}
+               className="transparent"
+               width="100"
+               height="100"
+               onLoad={this.imageLoaded} />
+        </div>
+        )
     }
 
     let items = this.props.images.map(image => {
@@ -147,7 +155,7 @@ class ThumbnailImageGallery extends React.Component {
         w: scaledImageFile.get("width"),
         h: scaledImageFile.get("height"),
         title: renderCaption(image),
-        pid: image.get("name")
+        pid: image.get("name"),
       }
     })
 

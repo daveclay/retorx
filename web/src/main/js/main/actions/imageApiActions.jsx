@@ -6,6 +6,13 @@ import { createImage } from "../../lib/imageData"
 
 const imageApi = jsonApiFor(baseImageContentServicePathBuilder)
 
+const withLoaderElement = (f) => {
+  let elem = document.getElementsByClassName("loader-overlay-show")[0]
+  if (elem) {
+    f(elem)
+  }
+}
+
 export const showAbout = () => {
   return {
     type: "SHOW_ABOUT"
@@ -21,21 +28,17 @@ export const loadTags = () => {
   }
 };
 
-const hideLoader = () => {
-  let body = document.getElementsByTagName("body")[0]
-  let loaderElement = document.getElementsByClassName("loader-overlay-show")[0]
-  if (loaderElement) {
-    body.removeChild(loaderElement)
-  }
-}
-
 export const loadImagesForTag = (tag) => {
   return dispatch => {
+    showLoader("")
     imageApi.get("tag/" + tag)
       .then(images => {
         return fromJS(images).map(image => createImage(image))
       }).then(images => {
         dispatch(imagesLoaded(tag, images))
+      }).catch(e => {
+        console.log(e)
+      }).then(() => {
         hideLoader()
       })
   }
@@ -61,3 +64,18 @@ export const imagesSaved = () => {
     type: "IMAGES_SAVED",
   }
 }
+
+const showLoader = (message) => {
+  withLoaderElement(loaderElement => {
+    loaderElement.getElementsByClassName("message")[0].innerHTML = message
+    loaderElement.style.display = "block"
+  })
+}
+
+const hideLoader = () => {
+  withLoaderElement(loaderElement => {
+    loaderElement.style.display = "none"
+  })
+}
+
+

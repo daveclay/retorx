@@ -35,7 +35,7 @@
     "react": "^15.5.4",
     "react-bootstrap": "^0.31.0",
     "react-dom": "^15.5.4",
-    "react-photoswipe": "^1.2.0",
+    "react-photoswipe": "daveclay/react-photoswipe#fix_gallery_on_close",
     "react-redux": "^5.0.4",
     "react-upload-file": "^2.0.0-beta.6",
     "redux": "^3.6.0",

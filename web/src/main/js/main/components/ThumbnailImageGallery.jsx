@@ -71,6 +71,16 @@ class ThumbnailImageGallery extends React.Component {
     this.shareButtonHandler = new ShareButtonHandler()
   }
 
+  componentDidMount() {
+    window.addEventListener("hashchange", () => this.onHashChange(), false);
+ }
+
+  onHashChange() {
+    if (window.location.hash.length < 1) {
+      window.location.hash = `&gid=${this.props.tag}`;
+    }
+  }
+
   componentWillUpdate(nextProps) {
     this.shareButtonHandler.setImages(nextProps.images)
   }
@@ -134,7 +144,6 @@ class ThumbnailImageGallery extends React.Component {
     }
 
     let getThumbnailContent = (imageGalleryItem) => {
-      console.log(imageGalleryItem.pid)
       return (
         <div className="image-container">
           <img key={imageGalleryItem.thumbnail}

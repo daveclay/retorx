@@ -11,10 +11,11 @@ const showAbout = (state) => {
 }
 
 const showLoader = (state, action) => {
-  return state.set("loader", Immutable.Map({
-    show: action.show,
-    message: action.message
-  }))
+  return state.set("showLoader", true)
+}
+
+const hideLoader = (state, action) => {
+  return state.set("showLoader", false)
 }
 
 const imagesLoaded = (state, action) => {
@@ -28,7 +29,8 @@ const imagesLoaded = (state, action) => {
 export default chainReducers(
   map("TAGS_LOADED").to(tagsLoaded),
   map("IMAGES_LOADED").to(imagesLoaded),
-  map("SHOW_LOADER").to(showLoader),
+  map("SHOW_CONTENT_LOADER").to(showLoader),
+  map("HIDE_CONTENT_LOADER").to(hideLoader),
   map("SHOW_ABOUT").to(showAbout),
 )
 

@@ -7,6 +7,7 @@ const mapStateToProps = (state) => {
   return {
     tags: state.get("tags"),
     showAbout: state.get("showAbout"),
+    showLoader: state.get("showLoader"),
   }
 }
 

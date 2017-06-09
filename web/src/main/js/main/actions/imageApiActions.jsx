@@ -6,13 +6,6 @@ import { createImage } from "../../lib/imageData"
 
 const imageApi = jsonApiFor(baseImageContentServicePathBuilder)
 
-const withLoaderElement = (f) => {
-  let elem = document.getElementsByClassName("loader-overlay-show")[0]
-  if (elem) {
-    f(elem)
-  }
-}
-
 export const showAbout = () => {
   return {
     type: "SHOW_ABOUT"
@@ -24,13 +17,19 @@ export const loadTags = () => {
     imageApi.get("tags")
       .then((tags) => {
         dispatch(tagsLoaded(fromJS(tags)))
+        hidePageLoader()
       })
   }
 };
 
+const hidePageLoader = () => {
+  let elem = document.getElementById("page-loader")
+  elem.style.display = "none"
+}
+
 export const loadImagesForTag = (tag) => {
   return dispatch => {
-    showLoader("")
+    dispatch(showContentLoader())
     updateGID(tag)
     imageApi.get("tag/" + tag)
       .then(images => {
@@ -40,7 +39,7 @@ export const loadImagesForTag = (tag) => {
       }).catch(e => {
         console.log(e)
       }).then(() => {
-        hideLoader()
+        dispatch(hideContentLoader())
       })
   }
 };
@@ -66,21 +65,18 @@ export const imagesSaved = () => {
   }
 }
 
+export const showContentLoader = () => {
+  return {
+    type: "SHOW_CONTENT_LOADER"
+  }
+}
+
+export const hideContentLoader = () => {
+  return {
+    type: "HIDE_CONTENT_LOADER"
+  }
+}
+
 const updateGID = (tag) => {
   window.location.hash = `&gid=${tag}`
 }
-
-const showLoader = (message) => {
-  withLoaderElement(loaderElement => {
-    loaderElement.getElementsByClassName("message")[0].innerHTML = message
-    loaderElement.style.display = "block"
-  })
-}
-
-const hideLoader = () => {
-  withLoaderElement(loaderElement => {
-    loaderElement.style.display = "none"
-  })
-}
-
-

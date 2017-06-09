@@ -4,6 +4,8 @@ import {
   PhotoSwipeGallery
 } from 'react-photoswipe';
 
+import Loader from "../containers/Loader"
+
 import {
   getThumbBoundsFn
 } from "../lib/photoswipe"
@@ -193,6 +195,7 @@ class ThumbnailImageGallery extends React.Component {
                            options={this.buildOptions()}
                            beforeChange={onChange}
                            thumbnailContent={getThumbnailContent}/>
+        <Loader />
       </div>
     )
   }

@@ -5,8 +5,13 @@
     width: 100%;
 }
 
-body {
+body,
+#page-loader,
+#content-loader {
     background-color: #45494a;
+}
+
+body {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -14,16 +19,23 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
-.loader-overlay-show {
+#page-loader {
     width: 100%;
     height: 100%;
     top: 60px;
     position: fixed;
-    background-color: #45494a;
 }
 
-.loader-overlay-show .loader,
-.loader-overlay-show .message {
+#content-loader {
+    width: 100%;
+    height: 100%;
+    top: 60px;
+    padding-top: 40px;
+    position: fixed;
+    text-align: center;
+}
+
+#page-loader .message {
     text-align: center;
     margin: 200px 0 auto auto;
     font-size: 23px;
@@ -47,19 +59,6 @@ body {
 
 .title .sm {
     font-size: 12px;
-}
-
-#loader {
-    position: fixed;
-    height: 100%;
-    width: 100%;
-    top: 50%;
-    padding: 20px;
-    text-align: center;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 100;
-    font-size: 15px;
-    color: #999da8;
 }
 
 #tag-text {

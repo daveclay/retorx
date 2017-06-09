@@ -16,10 +16,7 @@ export default fromJS({
   initialImage: (linkedImageData && linkedImageData.imageId) || null,
   tags: [],
   imagesByTag: {},
-  loader: {
-    show: false,
-    message: ""
-  },
+  showLoader: true,
   showAbout: false,
   tagInfo: {
     "figure constructions":

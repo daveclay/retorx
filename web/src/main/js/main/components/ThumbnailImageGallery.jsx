@@ -190,7 +190,8 @@ class ThumbnailImageGallery extends React.Component {
         {
           tagInfoElement
         }
-        <PhotoSwipeGallery ref={(photoswipeGallery) => this.photoswipeGallery = photoswipeGallery}
+        <PhotoSwipeGallery key={this.props.tag}
+                           ref={(photoswipeGallery) => this.photoswipeGallery = photoswipeGallery}
                            items={items.toJS()}
                            options={this.buildOptions()}
                            beforeChange={onChange}

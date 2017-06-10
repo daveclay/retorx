@@ -48,7 +48,8 @@ class ShareButtonHandler {
 
   getImageURLForShare( shareButtonData ) {
     let original = this.currentImage.get("imageFilesByVersion").get("original")
-    return "http://daveclay.com/" + src(this.currentImage, "original")
+    // return "http://daveclay.com/" + src(this.currentImage, "original")
+    return src(this.currentImage, "original")
   }
 
   getPageURLForShare( shareButtonData ) {
@@ -74,11 +75,11 @@ class ThumbnailImageGallery extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener("hashchange", () => this.onHashChange(), false);
+    window.addEventListener("hashchange", this.onHashChange, false);
  }
 
   onHashChange() {
-    if (window.location.hash.length < 1) {
+    if (window.location.hash.length < 1 && this.props) {
       window.location.hash = `&gid=${this.props.tag}`;
     }
   }

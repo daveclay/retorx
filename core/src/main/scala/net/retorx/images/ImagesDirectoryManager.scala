@@ -2,7 +2,6 @@ package net.retorx.images
 
 import com.google.inject.name.Named
 import java.io.{File, FileOutputStream, InputStream}
-import java.util
 
 import com.google.inject.{Inject, Singleton}
 import net.retorx.util.PropertiesUtils
@@ -15,6 +14,13 @@ import scala.collection.parallel.ForkJoinTaskSupport
 class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 									   managerType: ManagerType) {
 	val imagesDir = new File(contentDir, "images")
+  val support = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(4))
+
+	if (contentDir == null) {
+		throw new IllegalStateException("No content.dir specified!")
+	} else if (!contentDir.exists()) {
+    throw new IllegalStateException(s"content.dir ${contentDir.getAbsolutePath} does not exist")
+  }
 
 	def reprocessImagesFromOriginal(imageContent: ImageContent) {
 		managerType.reprocessImagesFromOriginal(imageContent)
@@ -28,7 +34,7 @@ class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 		val files = imagesDir.listFiles()
 		val parFilesList = files.par
 		// Let's not run out of file handles, eh?
-		parFilesList.tasksupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(4))
+    parFilesList.tasksupport = support
 		files.par.foreach { file  =>
 			try {
 				managerType.buildImageContent(file) match {
@@ -98,7 +104,9 @@ class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 
 	private def getTagFile = {
 		try {
-			contentDir.listFiles.find { file => file.getName.equals("tags") }
+			contentDir.listFiles.find { file =>
+        file.getName.equals("tags")
+      }
 		} catch {
 			case e: Exception =>
 				System.err.println(f"Couldn't load tags from ${contentDir.getAbsolutePath}")

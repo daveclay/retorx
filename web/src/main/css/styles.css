@@ -8,7 +8,8 @@
 body,
 #page-loader,
 #content-loader {
-    background-color: #45494a;
+    background-color: #504b48;
+    background-image: url("images/45-degree-fabric-dark.png");
 }
 
 body {
@@ -17,6 +18,7 @@ body {
     position: absolute;
     color: #999da8;
     font-family: 'Roboto', sans-serif;
+    /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
 }
 
 #page-loader {
@@ -42,7 +44,7 @@ body {
 }
 
 #gallery {
-    padding-top: 60px;
+    padding-top: 80px;
 }
 
 .hidden {
@@ -54,7 +56,7 @@ body {
     font-weight: 100;
     font-size: 18px;
     text-transform: uppercase;
-    padding: 15px 0 15px 0;
+    padding: 15px 0 15px 15px;
 }
 
 .title .sm {
@@ -72,11 +74,13 @@ body {
 
 .pswp-thumbnail {
     display: inline-block;
+    vertical-align: middle;
 }
 
-.pswp-thumbnail .image-container {
-    border-color: #242527;
-    border-style: solid;
+.pswp-thumbnail .image-container img {
+    border: solid #242527;
+    box-shadow: 5px 5px 10px black;
+    display: block;
 }
 
 .fadeIn {
@@ -91,6 +95,10 @@ body {
 
 @media only screen and (max-width: 768px) {
 
+    .pswp-gallery .image-container img {
+        border-width: 2px;
+    }
+
     .pswp-gallery .image-container {
         margin: 20px 8px 10px 8px;
         border-width: 5px;
@@ -98,19 +106,27 @@ body {
 }
 
 @media only screen and (min-width: 768px) {
+    .pswp-gallery .image-container img {
+        border-width: 4px;
+    }
+
     .pswp-gallery .image-container {
-        margin: 0 32px 32px 0;
-        border-width: 8px;
+        margin: 0 80px 52px 0;
     }
 }
 
 .image-container {
-    background-color: #333333;
+    max-width: 200px;
+}
+
+.image-container > .caption {
+    display: block;
+    margin-top: 10px;
 }
 
 .image-container img {
     padding: 0;
-    margin: 0;
+    margin: auto;
 }
 
 .transparent {

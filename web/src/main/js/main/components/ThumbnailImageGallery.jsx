@@ -147,23 +147,32 @@ class ThumbnailImageGallery extends React.Component {
     }
 
     let getThumbnailContent = (imageGalleryItem) => {
+      let image = imageGalleryItem.image;
+      let properties = image.get("properties");
+      let name = properties.get("name") || image.get("name");
+      let info = properties.get("info") || "";
       return (
         <div className="image-container">
           <img key={imageGalleryItem.thumbnail}
                src={imageGalleryItem.thumbnail}
                className="transparent"
-               width="100"
-               height="100"
+               width={imageGalleryItem.thumbnailWidth}
+               height={imageGalleryItem.thumbnailHeight}
                onLoad={this.imageLoaded} />
+          <span className="caption">{name + (info ? " " + info : "")}</span>
         </div>
         )
     }
 
     let items = this.props.images.map(image => {
+      let thumbnailImageFile = image.get("imageFilesByVersion").get("thumbnail")
       let scaledImageFile = image.get("imageFilesByVersion").get("scaled")
       return {
         src: src(image, "scaled"),
         thumbnail: src(image, "thumbnail"),
+        image: image,
+        thumbnailWidth: thumbnailImageFile.get("width"),
+        thumbnailHeight: thumbnailImageFile.get("height"),
         w: scaledImageFile.get("width"),
         h: scaledImageFile.get("height"),
         title: renderCaption(image),

@@ -20,10 +20,10 @@ const App = ({
 }) => (
   <Grid>
     <Navbar fixedTop inverse>
-      <Col xs={4} md={6}>
+      <Col xs={6}>
         <div className="title">Dave Clay</div>
       </Col>
-      <Col xs={8} smHidden mdHidden lgHidden>
+      <Col xs={6} smHidden mdHidden lgHidden>
         <ConnectedDropdownMenu/>
       </Col>
     </Navbar>

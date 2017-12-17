@@ -8,13 +8,10 @@ import net.retorx.util.PropertiesUtils
 import org.apache.commons.io.{FileUtils, IOUtils}
 import net.retorx.{ImageContent, ImageFile}
 
-import scala.collection.parallel.ForkJoinTaskSupport
-
 @Singleton
 class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 									   managerType: ManagerType) {
 	val imagesDir = new File(contentDir, "images")
-  val support = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(4))
 
 	if (contentDir == null) {
 		throw new IllegalStateException("No content.dir specified!")
@@ -32,10 +29,7 @@ class ImagesDirectoryManager @Inject()(@Named("content.dir") contentDir: File,
 		}
 
 		val files = imagesDir.listFiles()
-		val parFilesList = files.par
-		// Let's not run out of file handles, eh?
-    parFilesList.tasksupport = support
-		files.par.foreach { file  =>
+		files.foreach { file  =>
 			try {
 				managerType.buildImageContent(file) match {
 					case Some(imageContent) => callback(imageContent)

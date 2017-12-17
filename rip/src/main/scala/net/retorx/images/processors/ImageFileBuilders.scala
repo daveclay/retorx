@@ -120,14 +120,15 @@ class ScaledImageFileBuilderConfig(maxWidth: Int,
 
 class ThumbnailImageFileBuilderBuilderConfig(imageFileBuilderConfigLookup: ImageFileBuilderLookup) extends ImageFileBuilderConfigTemplate {
 
-	val width = 100
-	val height = 100
+	val width = 200
+	val height = 200
 	val originalImageBuilder = imageFileBuilderConfigLookup.getBuilderByName("original")
 
 	override val imageFileName = "thumbnail"
 	override val createBufferedImage = (data: BufferedImageContentData) => {
 		originalImageBuilder.withBufferedImage(data, originalBufferedImage => {
-			imageUtil.resizeImage(originalBufferedImage, width, height)
+			//imageUtil.resizeImage(originalBufferedImage, width, height)
+			imageUtil.resizeConstrainedScaledImage(originalBufferedImage, width, height)
 		})
 	}
 }
@@ -152,8 +153,8 @@ class ImageFileBuilderLookup {
 	val retorxImageProcessorNames = Array(
 		"original",
 		"scaled",
-		"thumbnail",
-		"desaturatedThumbnail")
+		"thumbnail")
+		//"desaturatedThumbnail")
 
 	val figureDrawingImageProcessorNames = Array(
 		"original",

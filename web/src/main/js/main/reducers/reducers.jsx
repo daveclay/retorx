@@ -11,6 +11,10 @@ const showAbout = (state) => {
   return state.set("showAbout", true)
 }
 
+const aboutLoaded = (state, action) => {
+  return state.set("about", action.about)
+}
+
 const showLoader = (state, action) => {
   return state.set("showLoader", true)
 }
@@ -18,7 +22,6 @@ const showLoader = (state, action) => {
 const hideLoader = (state, action) => {
   return state.set("showLoader", false)
 }
-
 
 const imagesLoaded = (state, action) => {
   let imagesByTag = state.get("imagesByTag")
@@ -34,5 +37,6 @@ export default chainReducers(
   map("SHOW_CONTENT_LOADER").to(showLoader),
   map("HIDE_CONTENT_LOADER").to(hideLoader),
   map("SHOW_ABOUT").to(showAbout),
+  map("ABOUT_LOADED").to(aboutLoaded),
 )
 

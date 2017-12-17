@@ -11,6 +11,10 @@ export const baseAdminContentServicePathBuilder = (path) => {
   return baseServicesPath("admin/" + path)
 }
 
+export const baseAboutContentServicePathBuilder = (path) => {
+  return baseServicesPath("about/" + path)
+}
+
 export const baseImageContentServicePathBuilder = (path) => {
   return baseServicesPath("images/" + path)
 }

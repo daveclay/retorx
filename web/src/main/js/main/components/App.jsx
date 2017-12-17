@@ -13,7 +13,7 @@ import {
 
 import { ConnectedDropdownMenu, ConnectedSidebarMenu } from "../containers/Menus"
 import ThumbnailImageGallery from "../containers/ThumbnailImageGallery"
-import About from "./About"
+import About from "../containers/About"
 
 const App = ({
   showAbout,

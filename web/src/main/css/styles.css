@@ -261,8 +261,10 @@ a:hover {
 
 .about-img {
     width: 100%;
-    max-width: 500px;
+    max-width: 200px;
     margin: 0 !important;
+    border: solid #242527;
+    box-shadow: 5px 5px 10px black;
 }
 
 #about-text {

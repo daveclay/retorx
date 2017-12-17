@@ -9,7 +9,8 @@ import { Provider } from 'react-redux'
 import { createStore, applyMiddleware, compose } from 'redux'
 import {
   loadImagesForTag,
-  loadTags
+  loadTags,
+  loadAbout
 } from "../main/actions/imageApiActions"
 import reducers from './reducers/reducers'
 import App from './containers/App'
@@ -28,6 +29,7 @@ const store = createStore(
 
 store.dispatch(loadTags())
 store.dispatch(loadImagesForTag(InitialState.get("initialTag")))
+store.dispatch(loadAbout())
 
 if (typeof document !== 'undefined') {
   render(

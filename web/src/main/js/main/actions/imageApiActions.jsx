@@ -1,14 +1,32 @@
 import { fromJS } from 'immutable'
 
 import { jsonApiFor } from "../../lib/api"
-import { baseImageContentServicePathBuilder } from "../../lib/paths"
+import {baseAboutContentServicePathBuilder, baseImageContentServicePathBuilder} from "../../lib/paths"
 import { createImage } from "../../lib/imageData"
 
+const aboutApi = jsonApiFor(baseAboutContentServicePathBuilder)
 const imageApi = jsonApiFor(baseImageContentServicePathBuilder)
 
 export const showAbout = () => {
   return {
     type: "SHOW_ABOUT"
+  }
+}
+
+export const aboutLoaded = (about) => {
+  return {
+    type: "ABOUT_LOADED",
+    about
+  }
+}
+
+export const loadAbout = () => {
+  return dispatch => {
+    aboutApi.get("info")
+      .then(about => {
+        dispatch(aboutLoaded(about.data))
+        hidePageLoader()
+      })
   }
 }
 

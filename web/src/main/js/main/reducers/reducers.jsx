@@ -3,7 +3,8 @@ import Immutable from "immutable"
 import { chainReducers, map } from '../../lib/chainReducers'
 
 const tagsLoaded = (state, action) => {
-  return state.set("tags", action.tags.filterNot(tag => tag == 'uncategorized'))
+  let tagsToDisplay = action.tags.filterNot(tag => tag == 'uncategorized');
+  return state.set("tags", tagsToDisplay.unshift("Latest Work"))
 }
 
 const showAbout = (state) => {
@@ -17,6 +18,7 @@ const showLoader = (state, action) => {
 const hideLoader = (state, action) => {
   return state.set("showLoader", false)
 }
+
 
 const imagesLoaded = (state, action) => {
   let imagesByTag = state.get("imagesByTag")

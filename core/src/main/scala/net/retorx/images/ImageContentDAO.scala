@@ -101,8 +101,7 @@ class ImageContentDAO @Inject()(var imageContentLibrary: ImageContentLibrary) {
 
 	def getLatestImages = {
 		withImageContentLibrary { imageContentLibrary =>
-			val tags = imageContentLibrary.imageContents.head.getTags
-			getImageContentByTag(tags(0))
+			imageContentLibrary.imageContents.slice(0, 10)
 		}
 	}
 }

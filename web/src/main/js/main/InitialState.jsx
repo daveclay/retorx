@@ -12,7 +12,7 @@ import {
 const linkedImageData = parseRequest()
 
 export default fromJS({
-  initialTag: (linkedImageData && linkedImageData.tag) || "figure painting",
+  initialTag: (linkedImageData && linkedImageData.tag) || "Latest Work",
   initialImage: (linkedImageData && linkedImageData.imageId) || null,
   tags: [],
   imagesByTag: {},

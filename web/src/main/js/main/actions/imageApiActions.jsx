@@ -25,13 +25,16 @@ export const loadTags = () => {
 const hidePageLoader = () => {
   let elem = document.getElementById("page-loader")
   elem.style.display = "none"
-}
+};
 
 export const loadImagesForTag = (tag) => {
   return dispatch => {
     dispatch(showContentLoader())
     updateGID(tag)
-    imageApi.get("tag/" + tag)
+
+    let apiCall = (tag == "Latest Work") ?
+      imageApi.get("latest") : imageApi.get("tag/" + tag);
+    apiCall
       .then(images => {
         return fromJS(images).map(image => createImage(image))
       }).then(images => {

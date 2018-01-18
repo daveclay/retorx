@@ -101,7 +101,9 @@ class ImageContentDAO @Inject()(var imageContentLibrary: ImageContentLibrary) {
 
 	def getLatestImages = {
 		withImageContentLibrary { imageContentLibrary =>
-			imageContentLibrary.imageContents.slice(0, 10)
+			imageContentLibrary.imageContents.filter{
+				image => image.properties.get("hideFromLatest").isEmpty
+			}.slice(0, 10)
 		}
 	}
 }

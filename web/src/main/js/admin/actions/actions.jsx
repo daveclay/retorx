@@ -147,7 +147,7 @@ export const saveMultipleImageProperties = (images, editorProperties) => {
       let updatedProperties = editorPropertiesToMap(editorProperties)
       let mergedProperties = assignMaps(exitingProperties, updatedProperties)
 
-      return saveImageData(name, image, mergedProperties).then(() => {
+      return saveImageData(name, image, mergedProperties, new FormData()).then(() => {
         count++;
         dispatch(showLoader(true, `Saved ${name} - ${count} of ${total}`))
       })
@@ -168,7 +168,7 @@ export const saveMultipleImageProperties = (images, editorProperties) => {
   }
 }
 
-const saveImageData = (name, image, properties, formData = new FormData()) => {
+const saveImageData = (name, image, properties, formData) => {
   addMapToFormData(properties, formData)
   let method = image != null ? "PUT" : "POST"
   return adminApi.send({

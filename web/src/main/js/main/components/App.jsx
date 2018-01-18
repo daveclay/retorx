@@ -19,7 +19,7 @@ const App = ({
   showAbout,
 }) => (
   <Grid>
-    <Navbar fixedTop inverse>
+    <Navbar fixedTop>
       <Col xs={6}>
         <div className="title">Dave Clay</div>
       </Col>

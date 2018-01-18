@@ -104,6 +104,7 @@ const closeMultipleImageEditor = (state) => {
 
 const closeSingleImageEditor = (state) => {
   return state.set("openSingleImageEditor", false)
+    .set("selectedImageFiles", Immutable.List())
 }
 
 const tagsReloaded = (state, action) => {

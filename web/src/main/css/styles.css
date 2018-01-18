@@ -8,17 +8,15 @@
 body,
 #page-loader,
 #content-loader {
-    background-color: #504b48;
-    background-image: url("images/45-degree-fabric-dark.png");
+    background-color: #b9b9b9;
 }
 
 body {
     width: 100%;
     height: 100%;
     position: absolute;
-    color: #999da8;
+    color: #505050;
     font-family: 'Roboto', sans-serif;
-    /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
 }
 
 #page-loader {
@@ -78,8 +76,8 @@ body {
 }
 
 .pswp-thumbnail .image-container img {
-    border: solid #242527;
-    box-shadow: 5px 5px 10px black;
+    border: solid #cecece;
+    box-shadow: 3px 3px 10px #6b6b6b;
     display: block;
 }
 
@@ -94,7 +92,6 @@ body {
 }
 
 @media only screen and (max-width: 768px) {
-
     .pswp-gallery .image-container img {
         border-width: 2px;
     }
@@ -106,12 +103,16 @@ body {
 }
 
 @media only screen and (min-width: 768px) {
+    #gallery {
+        margin-left: 130px;
+    }
+
     .pswp-gallery .image-container img {
-        border-width: 4px;
+        border-width: 2px;
     }
 
     .pswp-gallery .image-container {
-        margin: 0 80px 52px 0;
+        margin: 0 60px 32px 0px;
     }
 }
 
@@ -139,7 +140,7 @@ button.navbar-toggle {
 }
 
 ul.dropdown-menu {
-    background-color: #222;
+    background-color: #f8f8f8   ;
     right: -15px;
     min-width: 200px;
 }
@@ -147,21 +148,24 @@ ul.dropdown-menu {
 .dropdown-menu>li>a {
     font-family: 'Roboto', sans-serif;
     padding: 15px 0 0 5px;
-    color: #b0b0b0;
+    color: #505050;
     font-size: 18px;
     font-weight: 100;
     text-transform: capitalize;
 }
 
 button#category-dropdown {
-    color: #b0b0b0;
-    background-color: #222;
+    color: #505050;
+    background-color: transparent;
     border: none;
     padding-top: 15px;
 }
 
+
 .navbar>.container {
+    background-color: #dedede;
     padding: 0;
+    box-shadow: 0px 2px 20px #989898;
 }
 
 .navbar-menu {
@@ -182,6 +186,7 @@ button#category-dropdown {
     font-weight: 100;
     font-size: 13px;
     text-transform: capitalize;
+    position: fixed;
 }
 
 .sidebar-menu ul {
@@ -206,7 +211,7 @@ button#category-dropdown {
 }
 
 .sidebar-menu li a {
-    color: #999da8;
+    color: #505050;
     text-transform: capitalize;
 }
 

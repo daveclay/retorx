@@ -4,7 +4,7 @@ import { menuItems } from "./lib/menuItems"
 
 export default fromJS({
   tags: [],
-  currentTag: "figure painting",
+  currentTag: "paintings",
   imagesByTag: {},
   menuItems: menuItems,
   imageEditorProperties: [],

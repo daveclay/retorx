@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto:100,300');
+@import url('https://fonts.googleapis.com/css?family=Barlow+Condensed|Nanum+Myeongjo');
 
 .container {
     margin: 0;
@@ -9,6 +9,7 @@ body,
 #page-loader,
 #content-loader {
     background-color: #b9b9b9;
+    font-family: 'Nanum Myeongjo', sans-serif;
 }
 
 body {
@@ -16,7 +17,10 @@ body {
     height: 100%;
     position: absolute;
     color: #505050;
-    font-family: 'Roboto', sans-serif;
+}
+
+.main-content {
+    background-color: #b9b9b9;
 }
 
 #page-loader {
@@ -50,9 +54,9 @@ body {
 }
 
 .title {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Barlow Condensed', sans-serif;
     font-weight: 100;
-    font-size: 18px;
+    font-size: 21px;
     text-transform: uppercase;
     padding: 15px 0 15px 15px;
 }
@@ -103,7 +107,7 @@ body {
 }
 
 @media only screen and (min-width: 768px) {
-    #gallery {
+    .main-content {
         margin-left: 130px;
     }
 
@@ -120,9 +124,19 @@ body {
     max-width: 200px;
 }
 
-.image-container > .caption {
-    display: block;
+
+.image-container > .artwork-title {
     margin-top: 10px;
+    color: #303030;
+}
+
+.artwork-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.image-container > .caption {
 }
 
 .image-container img {
@@ -146,11 +160,8 @@ ul.dropdown-menu {
 }
 
 .dropdown-menu>li>a {
-    font-family: 'Roboto', sans-serif;
     padding: 15px 0 0 5px;
     color: #505050;
-    font-size: 18px;
-    font-weight: 100;
     text-transform: capitalize;
 }
 
@@ -169,11 +180,14 @@ button#category-dropdown {
 }
 
 .navbar-menu {
-    font-family: 'Roboto', sans-serif;
-    font-size: 18px;
-    text-transform: capitalize;
     list-style: none;
     float: right;
+}
+
+.navbar li, .navbar button {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    text-transform: capitalize;
 }
 
 .dropdown.btn-group {
@@ -181,10 +195,9 @@ button#category-dropdown {
 }
 
 .sidebar-menu {
+    font-family: 'Barlow Condensed', sans-serif;
     padding-top: 60px;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 100;
-    font-size: 13px;
+    font-size: 18px;
     text-transform: capitalize;
     position: fixed;
 }
@@ -205,18 +218,27 @@ button#category-dropdown {
     padding-top: 4px;
 }
 
+.sidebar-menu li.active-menu-item {
+    border-bottom: 1px solid black;
+}
+
 .sidebar-menu li.active-menu-item a {
-    color: #ffffff;
-    font-weight: 700;
+    color: black;
+    font-weight: 600;
 }
 
 .sidebar-menu li a {
-    color: #505050;
+    color: #696969;
     text-transform: capitalize;
+    -o-transition:.5s;
+    -ms-transition:.5s;
+    -moz-transition:.5s;
+    -webkit-transition:.5s;
+    transition:.25s;
 }
 
 .sidebar-menu li a:hover {
-    color: white;
+    color: black;
 }
 
 .tagImage {
@@ -235,7 +257,6 @@ a:hover {
 }
 
 .imageInfo {
-    display: block;
     width: 300px;
 }
 
@@ -246,7 +267,6 @@ a:hover {
 
 #about {
     padding-top: 65px;
-    margin: 0 auto;
     vertical-align: top;
     text-align: left;
 }

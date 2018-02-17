@@ -21,14 +21,15 @@ const renderCaption = (image) => {
 
   return `
     <span>
-      <span className="imageName">${name}</span>
-      <span>/</span>
-      <span className="imageDate">${dateText(image)}</span>
+      <div class="artwork-title">
+        ${name}
+      </div>
+      <span class="imageDate">${dateText(image)}</span>
       ${
         properties.has("info") ?
           `<span>
             <span>/</span>
-            <span className="imageInfo">${properties.get("info")}</span>
+            <span class="imageInfo">${properties.get("info")}</span>
           </span>`
           :
           ""
@@ -159,7 +160,10 @@ class ThumbnailImageGallery extends React.Component {
                width={imageGalleryItem.thumbnailWidth}
                height={imageGalleryItem.thumbnailHeight}
                onLoad={this.imageLoaded} />
-          <span className="caption">{name + (info ? " " + info : "")}</span>
+          <div className="artwork-title">
+            {name}
+          </div>
+          <span className="caption">{(info ? " " + info : "")}</span>
         </div>
         )
     }
@@ -196,7 +200,7 @@ class ThumbnailImageGallery extends React.Component {
     let tagInfoElement = this.props.tagInfo ? <div id="tag-text" dangerouslySetInnerHTML={reactTagInfo}/> : null
 
     return (
-      <div id="gallery" className="col-xs-12 col-sm-9 col-md-10">
+      <div id="gallery" className="main-content col-xs-12 col-sm-9 col-md-10">
         {
           tagInfoElement
         }

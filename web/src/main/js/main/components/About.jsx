@@ -4,7 +4,7 @@ const About = ({about}) => {
   let aboutHtml = { __html: about }
   return (
     <div id="about" style={{display: "block"}}
-         className="col-xs-12 col-sm-9 col-md-10" dangerouslySetInnerHTML={aboutHtml}/>
+         className="main-content col-xs-12 col-sm-9 col-md-10" dangerouslySetInnerHTML={aboutHtml}/>
   )
 }
 
